@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Power Meter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/power/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/power/images/favicon-16x16.png">
+    <meta name="theme-color" content="#1f1f1f">
+    <link rel="stylesheet" href="/power/main.css" />
+    <link rel="manifest" href="/power/manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet"> 
+</head>
+
+<body>
+    <div class="header">
+        Power Monitoring
+    </div>
+    <div class="sub-header">Live data</div>
+    <div class="cards">
+        <div class="card">
+            <div class="title">Power</div>
+            <div class="value" id="power"></div>
+        </div>
+        <div class="card">
+            <div class="title">Current</div>
+            <div class="value" id="current"></div>
+        </div>
+        <div class="card">
+            <div class="title">Voltage</div>
+            <div class="value" id="voltage"></div>
+        </div>
+        <div class="card">
+            <div class="title">Frequency</div>
+            <div class="value" id="frequency"></div>
+        </div>
+        <div class="card">
+            <div class="title">Power Factor</div>
+            <div class="value" id="pf"></div>
+        </div>
+        <div class="card">
+            <div class="title">Energy</div>
+            <div class="value" id="energy"></div>
+        </div>
+        <div class="card">
+            <div class="title">Uptime</div>
+            <div class="value" id="uptime"></div>
+        </div>
+    </div>
+    <script src="/power/main.js"></script>
+</body>
+
+</html>
