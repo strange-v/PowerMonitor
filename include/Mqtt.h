@@ -13,13 +13,10 @@ extern "C"
 #include <NodeData.h>
 #include <Cfg.h>
 
-#ifndef QUEUE_RECEIVE_DELAY
-#define QUEUE_RECEIVE_DELAY 10
-#endif
-
 extern EventGroupHandle_t eg;
-extern QueueHandle_t qData;
+extern QueueHandle_t qMqtt;
 extern AsyncMqttClient mqtt;
+extern TimerHandle_t tConectMqtt;
 extern bool ethConnected;
 extern NodeData data;
 

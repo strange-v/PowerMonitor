@@ -27,7 +27,7 @@ void taskSendMqttMessages(void *pvParameters)
     MqttMessage msg;
     for (;;)
     {
-        if (xQueueReceive(qData, &msg, QUEUE_RECEIVE_DELAY))
+        if (xQueueReceive(qMqtt, &msg, QUEUE_RECEIVE_DELAY))
         {
             _mqttPublish(msg.topic, msg.data);
         }
@@ -36,10 +36,12 @@ void taskSendMqttMessages(void *pvParameters)
 
 void onMqttConnect(bool sessionPresent)
 {
+    xTimerStop(tConectMqtt, TICKS_TO_WAIT12);
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason)
 {
+    xTimerStart(tConectMqtt, TICKS_TO_WAIT12);
 }
 
 MqttMessage composeMessage(NodeData data)

@@ -36,7 +36,7 @@ function onMessage(event) {
     voltage.innerText = `${data.v} V`;
     frequency.innerText = `${data.f} Hz`;
     pf.innerText = `${data.pf}`;
-    energy.innerText = `${data.e} kWh`;
+    energy.innerText = `${fromatNumber(data.e, 1)} kWh`;
     uptime.innerText = formatUptime(data.u);
 
     if (data.pw)
@@ -62,23 +62,30 @@ function onLoad(event) {
 
 function formatUptime(value) {
     const days = Math.floor(value / (24 * 60 * 60));
-    const hours = Math.floor(value / (60 * 60));
+    let hours = Math.floor(value / (60 * 60));
     const minutes = Math.floor(value / 60) % 60;
     const seconds = value % 60;
 
-    const result = days > 1
-        ? [{ value: days, suffix: 'd' },
+    let result = [{ value: hours, suffix: 'h' },
+    { value: minutes, suffix: 'm' },
+    { value: seconds, suffix: 's' }];
+
+    if (days > 1) {
+        hours = hours - days * 24;
+        result = [{ value: days, suffix: 'd' },
         { value: hours, suffix: 'h' },
-        { value: minutes, suffix: 'm' }]
-        : [{ value: hours, suffix: 'h' },
-        { value: minutes, suffix: 'm' },
-        { value: seconds, suffix: 's' }]
+        { value: minutes, suffix: 'm' }];
+    }
 
     return result
         .map(data => {
             return `${data.value}${data.suffix}`
         })
         .join(' ')
+}
+
+function fromatNumber(v, scale, suffix = '') {
+    return v.toFixed(scale).replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/,'$1');
 }
 
 window.addEventListener('load', onLoad);
