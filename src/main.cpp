@@ -12,6 +12,7 @@ extern "C"
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
+#include <EEPROM.h>
 #include <AsyncMqttClient.h>
 #include <NodeData.h>
 #include <Network.h>
@@ -20,6 +21,7 @@ extern "C"
 #include <Display.h>
 #include <Mqtt.h>
 #include <Module.h>
+#include <Settings.h>
 #include <Cfg.h>
 
 void requestData();
@@ -37,7 +39,9 @@ AsyncWebSocket ws("/power/ws");
 AsyncMqttClient mqtt;
 
 bool ethConnected = false;
+Settings moduleSettings;
 NodeData data;
+uint8_t dataBuffer[512];
 
 void setup()
 {
@@ -49,6 +53,10 @@ void setup()
   sema_PZEM = xSemaphoreCreateMutex();
 
   SPIFFS.begin(true);
+  EEPROM.begin(sizeof(Settings));
+
+  moduleSettings = getSettings();
+
   u8g2.begin();
   u8g2.setContrast(10);
   
@@ -63,7 +71,7 @@ void setup()
   xTaskCreatePinnedToCore(taskUpdateDisplay, "UpdateDisplay", TaskStack15K, NULL, Priority3, NULL, Core1);
   xTaskCreatePinnedToCore(taskUpdateWebClients, "UpdateWebClients", TaskStack10K, NULL, Priority3, NULL, Core1);
   xTaskCreatePinnedToCore(taskSendMqttMessages, "tMqtt", TaskStack10K, NULL, Priority2, NULL, Core1);
-  tRequestData = xTimerCreate("RequestData", pdMS_TO_TICKS(Cfg::requestDataInterval), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(requestData));
+  tRequestData = xTimerCreate("RequestData", pdMS_TO_TICKS(moduleSettings.requestDataInterval), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(requestData));
   tConectMqtt = xTimerCreate("ConectMqtt", pdMS_TO_TICKS(10000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
 
   initWebServer();
@@ -74,6 +82,8 @@ void setup()
 void loop()
 {
   ArduinoOTA.handle();
+  //ToDo: Do this in timer
+  ws.cleanupClients();
 }
 
 void requestData()

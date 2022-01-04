@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Power Meter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/power/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/power/images/favicon-16x16.png">
+    <meta id="theme-color" content="#1f1f1f">
+    <link rel="stylesheet" href="/power/main.css" />
+    <link rel="manifest" href="/power/manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+    <script src="/power/main.js"></script>
+</head>
+
+<body>
+    <div class="header">
+        <a href="/power/"  class="button back"></a>
+        <div class="title">Power Monitoring</div>
+        <a id="save" class="button save"></a>
+    </div>
+    <div id="app-spinner"></div>
+    <div id="content">
+        <form id="form" class="form">
+            <div class="sub-header">Limits</div>
+
+            <div class="field">
+                <label for="voltageMin">Voltage Min (V)</label>
+                <input type="number" id="voltageMin" min="0"/>
+            </div>
+    
+            <div class="field">
+                <label for="voltageMax">Voltage Max (V)</label>
+                <input type="number" id="voltageMax" min="0"/>
+            </div>
+    
+            <div class="field">
+                <label for="powerMax">Power Max (W)</label>
+                <input type="number" id="powerMax" min="0"/>
+            </div>
+    
+            <div class="field">
+                <label for="currentMax">Current Max (A)</label>
+                <input type="number" id="currentMax" min="0"/>
+            </div>
+    
+
+            <div class="sub-header">MQTT Settings</div>
+
+            <div class="field checkbox">
+                <input type="checkbox" id="enableMqtt"/>
+                <label for="enableMqtt">Enable Mqtt</label>
+            </div>
+
+            <div class="field">
+                <label for="mqttServer">Server</label>
+                <input type="text" id="mqttServer" placeholder="192.168.0.1:1883" maxlength="32"/>
+            </div>
+    
+            <div class="field">
+                <label for="mqttUser">User</label>
+                <input type="text" id="mqttUser" maxlength="30"/>
+            </div>
+    
+            <div class="field">
+                <label for="mqttPassword">Pasword</label>
+                <input type="password" id="mqttPassword" maxlength="30"/>
+            </div>
+    
+            <div class="field">
+                <label for="mqttTopic">Topic</label>
+                <input type="text" id="mqttTopic" maxlength="30"/>
+            </div>
+
+
+            <div class="sub-header">System</div>
+            
+            <div class="field">
+                <label for="requestDataInterval">Request Data Interval (ms)</label>
+                <input type="number" id="requestDataInterval"/>
+            </div>
+
+            <div class="field">
+                <label for="otaPassword">OTA password</label>
+                <input type="password" id="otaPassword" maxlength="30"/>
+            </div>
+        </form>
+    </div>
+    <script>(new SettingsPage).init();</script>
+</body>
+</html>

@@ -2,15 +2,21 @@
 
 void configureMqtt()
 {
+    if (!moduleSettings.enableMqtt)
+        return;
+
     mqtt.onConnect(onMqttConnect);
     mqtt.onDisconnect(onMqttDisconnect);
     // mqtt.onMessage(onMqttMessage);
-    mqtt.setServer(Cfg::mqttHost, Cfg::mqttPort);
-    mqtt.setCredentials(Cfg::mqttUser, Cfg::mqttPassword);
+    mqtt.setServer(moduleSettings.mqttHost, moduleSettings.mqttPort);
+    mqtt.setCredentials(moduleSettings.mqttUser, moduleSettings.mqttPassword);
 }
 
 void connectToMqtt()
 {
+    if (!moduleSettings.enableMqtt)
+        return;
+    
     if (ethConnected)
     {
         debugPrint("Connecting to MQTT...");
@@ -58,7 +64,7 @@ MqttMessage composeMessage(NodeData data)
     doc["u"] = data.uptime;
 
     serializeJson(doc, msg.data, sizeof(msg.data));
-    memcpy(msg.topic, Cfg::mqttTopic, sizeof(Cfg::mqttTopic));
+    strlcpy(msg.topic, moduleSettings.mqttTopic, sizeof(moduleSettings.mqttTopic));
 
     return msg;
 }

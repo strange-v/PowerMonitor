@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     padding: 0;
     margin: 0;
@@ -8,13 +12,51 @@ body {
 }
 
 .header {
+    position: fixed;
+    display: flex;
     height: 48px;
+    width: 100%;
     background-color: #1f1f1f;
     font-size: 22px;
     line-height: 48px;
-    padding: 0 24px;
+    padding: 0 3% 0 24px;
     box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
     margin-bottom: 8px;
+}
+
+.header .title {
+    margin-right: auto;
+}
+
+.header .button {
+    display: inline-block;
+    height: 32px;
+    width: 32px;
+    margin-top: 8px;
+    cursor: pointer;
+}
+.header .back {
+    margin-left: -16px;
+    margin-right: 8px;
+    background: url("images/back.svg") center center no-repeat;
+    background-size: 24px 24px;
+}
+.header .settings {
+    background: url("images/settings.svg") center center no-repeat;
+    background-size: 24px 24px;
+}
+.header .save {
+    background: url("images/save.svg") center center no-repeat;
+    background-size: 24px 24px;
+}
+#app-spinner {
+    height: 128px;
+    background: url("images/app-spinner.svg") center 100% no-repeat;
+    background-size: 64px 64px;
+}
+#content {
+    padding: 48px 0 24px 0;
+    display: none;
 }
 .sub-header {
     padding: 8px 24px;
@@ -56,5 +98,55 @@ body {
     font-size: 1.6em;
 }
 
+form {
+    padding: 8px 24px;
+}
+
+form .sub-header {
+    padding: 8px 0;
+}
+
+form .field {
+    margin-bottom: 8px;
+}
+form .field.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+form .field.checkbox {
+    display: flex;
+}
+form .field.checkbox label {
+    margin-right: auto;
+}
+form .field.checkbox input {
+    margin-right: 16px;
+    margin-top: 8px;
+}
+
+form label {
+    display: inline-block;
+    padding: 4px 0px;
+    color: #BDBDBD;
+}
+
+form input:not([type='checkbox']) {
+    width: 100%;
+    font-size: 1em;
+    padding: 8px;
+    background-color: #1d1d1d;
+    border: none;
+    color: #fff;
+    box-sizing: border-box;
+}
+form input[type=checkbox]
+{
+  -ms-transform: scale(2); /* IE */
+  -moz-transform: scale(2); /* FF */
+  -webkit-transform: scale(2); /* Safari and Chrome */
+  -o-transform: scale(2); /* Opera */
+  transform: scale(2);
+  padding: 10px;
+}
 /* primary: #bb86fc */
 /* secondary: #03dac5 */

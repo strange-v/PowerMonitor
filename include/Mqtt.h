@@ -11,6 +11,7 @@ extern "C"
 #include <ArduinoJson.h>
 #include <Module.h>
 #include <NodeData.h>
+#include <Settings.h>
 #include <Cfg.h>
 
 extern EventGroupHandle_t eg;
@@ -19,6 +20,7 @@ extern AsyncMqttClient mqtt;
 extern TimerHandle_t tConectMqtt;
 extern bool ethConnected;
 extern NodeData data;
+extern Settings moduleSettings;
 
 struct MqttMessage
 {

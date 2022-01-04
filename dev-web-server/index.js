@@ -3,11 +3,16 @@ const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = new express();
+const server = 'http://192.168.0.1'
 
 app.use('/power/ws', createProxyMiddleware({
-    target: 'http://192.168.0.131',
+    target: server,
     changeOrigin: true,
     ws: true
+}));
+app.use('/power/api', createProxyMiddleware({
+    target: server,
+    changeOrigin: true
 }));
 app.get('*', (req, res) => {
     let file = 'index.html';

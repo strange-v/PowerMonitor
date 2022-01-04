@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "numeric": "cpp"
+        "numeric": "cpp",
+        "bitset": "cpp",
+        "algorithm": "cpp"
     }
 }

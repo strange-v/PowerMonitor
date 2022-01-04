@@ -12,45 +12,50 @@
     <link rel="manifest" href="/power/manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+    <script src="/power/main.js"></script>
 </head>
 
 <body>
     <div class="header">
-        Power Monitoring
+        <div class="title">Power Monitoring</div>
+        <a href="/power/settings.html" class="button settings"></a>
     </div>
-    <div class="sub-header">Live data</div>
-    <div class="cards">
-        <div class="card">
-            <div class="title">Power</div>
-            <div class="value" id="power"></div>
-        </div>
-        <div class="card">
-            <div class="title">Current</div>
-            <div class="value" id="current"></div>
-        </div>
-        <div class="card">
-            <div class="title">Voltage</div>
-            <div class="value" id="voltage"></div>
-        </div>
-        <div class="card">
-            <div class="title">Frequency</div>
-            <div class="value" id="frequency"></div>
-        </div>
-        <div class="card">
-            <div class="title">Power Factor</div>
-            <div class="value" id="pf"></div>
-        </div>
-        <div class="card">
-            <div class="title">Energy</div>
-            <div class="value" id="energy"></div>
-        </div>
-        <div class="card">
-            <div class="title">Uptime</div>
-            <div class="value" id="uptime"></div>
+    <div id="app-spinner"></div>
+    <div id="content">
+        <div class="sub-header">Live data</div>
+        <div class="cards">
+            <div class="card">
+                <div class="title">Power</div>
+                <div class="value" id="power"></div>
+            </div>
+            <div class="card">
+                <div class="title">Current</div>
+                <div class="value" id="current"></div>
+            </div>
+            <div class="card">
+                <div class="title">Voltage</div>
+                <div class="value" id="voltage"></div>
+            </div>
+            <div class="card">
+                <div class="title">Frequency</div>
+                <div class="value" id="frequency"></div>
+            </div>
+            <div class="card">
+                <div class="title">Power Factor</div>
+                <div class="value" id="pf"></div>
+            </div>
+            <div class="card">
+                <div class="title">Energy</div>
+                <div class="value" id="energy"></div>
+            </div>
+            <div class="card">
+                <div class="title">Uptime</div>
+                <div class="value" id="uptime"></div>
+            </div>
         </div>
     </div>
-    <script src="/power/main.js"></script>
+    <script>(new LiveDataPage).init();</script>
 </body>
 
 </html>

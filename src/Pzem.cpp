@@ -16,22 +16,26 @@ void taskRetrieveData(void *pvParameters)
             data.pf = pzem.pf();
             data.uptime = millis() / 1000;
 
-            if (Cfg::voltageMin > 0 && Cfg::voltageMax > 0)
-                data.voltageWarn = data.voltage <= Cfg::voltageMin || data.voltage >= Cfg::voltageMax;
-            if (Cfg::powerMax > 0)
-                data.powerWarn = data.power >= Cfg::powerMax;
-            if (Cfg::currentMax > 0)
-                data.currentWarn = data.current >= Cfg::currentMax;
+            if (moduleSettings.voltageMin > 0 && moduleSettings.voltageMax > 0)
+                data.voltageWarn = data.voltage <= moduleSettings.voltageMin || data.voltage >= moduleSettings.voltageMax;
+            if (moduleSettings.powerMax > 0)
+                data.powerWarn = data.power >= moduleSettings.powerMax;
+            if (moduleSettings.currentMax > 0)
+                data.currentWarn = data.current >= moduleSettings.currentMax;
 
             xSemaphoreGive(sema_PZEM);
 
             xEventGroupSetBits(eg, EVENT_UPDATE_DISPLAY | EVENT_UPDATE_WEB_CLIENTS);
 
-            MqttMessage msg = composeMessage(data);
-            if (xQueueSendToBack(qMqtt, &msg, 10) != pdPASS)
+            if (moduleSettings.enableMqtt)
             {
-                debugPrint("Failed to add to the mqtt queue");
+                MqttMessage msg = composeMessage(data);
+                if (xQueueSendToBack(qMqtt, &msg, QUEUE_RECEIVE_DELAY) != pdPASS)
+                {
+                    debugPrint("Failed to add to the mqtt queue");
+                }
             }
+            
         }
     }
 }
