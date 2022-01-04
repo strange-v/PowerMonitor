@@ -64,7 +64,7 @@ void setup()
   WiFi.onEvent(WiFiEvent);
   ETH.begin();
   
-  ArduinoOTA.setPassword(Cfg::otaPassword);
+  ArduinoOTA.setPassword(moduleSettings.otaPassword);
   ArduinoOTA.begin();
 
   xTaskCreatePinnedToCore(taskRetrieveData, "RetrieveData", TaskStack10K, NULL, Priority3, NULL, Core1);
