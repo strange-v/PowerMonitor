@@ -1,0 +1,155 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    background-color: #121212;
+    color: #fff;
+    font-family: Roboto;
+    font-size: 16px;
+}
+
+.header {
+    position: fixed;
+    display: flex;
+    height: 48px;
+    width: 100%;
+    background-color: #1f1f1f;
+    font-size: 22px;
+    line-height: 48px;
+    padding: 0 3% 0 24px;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+    margin-bottom: 8px;
+
+    .title {
+        margin-right: auto;
+    }
+    .button {
+        display: inline-block;
+        height: 32px;
+        width: 32px;
+        margin-top: 8px;
+        cursor: pointer;
+    }
+    .back {
+        margin-left: -16px;
+        margin-right: 8px;
+        background: url("images/back.svg") center center no-repeat;
+        background-size: 24px 24px;
+    }
+    .settings {
+        background: url("images/settings.svg") center center no-repeat;
+        background-size: 24px 24px;
+    }
+    .save {
+        background: url("images/save.svg") center center no-repeat;
+        background-size: 24px 24px;
+    }
+}
+
+#app-spinner {
+    height: 128px;
+    background: url("images/app-spinner.svg") center 100% no-repeat;
+    background-size: 64px 64px;
+}
+
+#content {
+    padding: 48px 0 24px 0;
+    display: none;
+}
+
+.sub-header {
+    padding: 8px 24px;
+    font-size: 1.1em;
+    font-weight: 300;
+}
+
+.cards {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 0 3%;
+}
+.card {
+    flex: 0 1 48.5%;
+    height: 120px;
+    background-color: #1d1d1d;
+    margin-bottom: 3%;
+    padding: 16px;
+    box-sizing: border-box;
+    border-radius: 5px;
+
+    &.warning {
+        background-color: #cf6679;
+        color: #000;
+
+        .title {
+            opacity: 1;
+        }
+    }
+
+    .title {
+        opacity: 38%;
+        margin-bottom: 18px;
+    }
+
+    .value {
+        font-size: 2em;
+    }
+}
+
+#uptime {
+    font-size: 1.6em;
+}
+
+form {
+    padding: 8px 24px;
+
+    .sub-header {
+        padding: 8px 0;
+    }
+    .field {
+        margin-bottom: 8px;
+
+        &.disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        &.checkbox {
+            display: flex;
+
+            input {
+                margin-right: 16px;
+                margin-top: 8px;
+            }
+            label {
+                margin-right: auto;
+            }
+        }
+    }
+    label {
+        display: inline-block;
+        padding: 4px 0px;
+        color: #bdbdbd;
+    }
+    input:not([type="checkbox"]) {
+        width: 100%;
+        font-size: 1em;
+        padding: 8px;
+        background-color: #1d1d1d;
+        border: none;
+        color: #fff;
+        box-sizing: border-box;
+    }
+    input[type="checkbox"] {
+        -ms-transform: scale(2); /* IE */
+        -moz-transform: scale(2); /* FF */
+        -webkit-transform: scale(2); /* Safari and Chrome */
+        -o-transform: scale(2); /* Opera */
+        transform: scale(2);
+        padding: 10px;
+    }
+}

@@ -2,26 +2,14 @@
 
 void initWebServer()
 {
-    //ToDo: Handle static files as static
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-              { request->redirect("/power/"); });
+              { request->redirect("/power/index.html"); });
     server.on("/power/", HTTP_GET, [](AsyncWebServerRequest *request)
-              { request->send(SPIFFS, "/index.html", CONTENT_TYPE_HTML); });
-    server.on("/power/settings.html", HTTP_GET, [](AsyncWebServerRequest *request)
-              { request->send(SPIFFS, "/settings.html", CONTENT_TYPE_HTML); });
-    server.on("/power/main.css", HTTP_GET, [](AsyncWebServerRequest *request)
-              { request->send(SPIFFS, "/main.css", CONTENT_TYPE_CSS); });
-    server.on("/power/main.js", HTTP_GET, [](AsyncWebServerRequest *request)
-              { request->send(SPIFFS, "/main.js", CONTENT_TYPE_JS); });
-    server.on("/power/service-worker.js", HTTP_GET, [](AsyncWebServerRequest *request)
-              { request->send(SPIFFS, "/service-worker.js", CONTENT_TYPE_JS); });
-    server.on("/power/manifest.json", HTTP_GET, [](AsyncWebServerRequest *request)
-              { request->send(SPIFFS, "/manifest.json", CONTENT_TYPE_JS); });
-    server.on("/power/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request)
-              { request->send(SPIFFS, "/favicon.ico", CONTENT_TYPE_JS); });
+              { request->redirect("/power/index.html"); });
     server.on("/power/api/settings", HTTP_GET, _getSettings);
     server.on("/power/api/settings", HTTP_PUT, [](AsyncWebServerRequest *request){}, NULL, _saveSettings);
         
+    server.serveStatic("/power/", SPIFFS, "/");
     server.serveStatic("/power/images", SPIFFS, "/images");
     server.onNotFound(_notFound);
 
