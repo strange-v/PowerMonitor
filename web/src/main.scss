@@ -105,6 +105,16 @@ body {
     font-size: 1.6em;
 }
 
+.notification {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px;
+    background-color: #424242;
+}
+
 form {
     padding: 8px 24px;
 

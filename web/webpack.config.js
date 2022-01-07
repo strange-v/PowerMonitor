@@ -1,12 +1,15 @@
 const path = require('path'),
     fs = require('fs'),
-	ini = require('ini'),
-	webpack = require("webpack"),
-	TerserPlugin = require('terser-webpack-plugin'),
-	CopyPlugin = require("copy-webpack-plugin"),
-	CompressionPlugin = require('compression-webpack-plugin'),
-	MiniCssExtractPlugin = require('mini-css-extract-plugin'),
-	RemovePlugin = require('remove-files-webpack-plugin');
+    ini = require('ini'),
+    webpack = require("webpack"),
+    TerserPlugin = require('terser-webpack-plugin'),
+    CopyPlugin = require("copy-webpack-plugin"),
+    CompressionPlugin = require('compression-webpack-plugin'),
+    MiniCssExtractPlugin = require('mini-css-extract-plugin'),
+    RemovePlugin = require('remove-files-webpack-plugin'),
+    MiniSvgDataPlugin = require('mini-svg-data-uri'),
+    package = require('./package.json'),
+    crypto = require('crypto');
 
 const platformio = ini.parse(fs.readFileSync('../platformio.ini', 'utf-8'));
 const moduleHost = platformio['env:REMOTE'].upload_port;
@@ -23,7 +26,7 @@ const hasCompressedCopy = (filePath) => {
 
 const config = {
     entry: {
-        main: './src/index.js'
+        main: './src/index.js',
     },
     mode: mode,
     output: {
@@ -42,9 +45,17 @@ const config = {
         rules: [
             {
                 test: /\.(svg)$/,
-                type: 'asset/resource',
+                type: 'asset/inline',
                 generator: {
-                    filename: 'images/[hash][ext][query]'
+                    dataUrl(content) {
+                        return MiniSvgDataPlugin(content.toString());
+                    }
+                },
+                use: {
+                    loader: 'svgo-loader',
+                    options: {
+                        configFile: '../svgo.config.js'
+                    }
                 }
             },
             {
@@ -60,8 +71,23 @@ const config = {
     plugins: [
         new CopyPlugin({
             patterns: [
-                { from: 'src/statics', to: dstPathFull },
-                { from: '*.html', to: dstPathFull, context: 'src/' },
+                {
+                    from: 'src/statics',
+                    to: dstPathFull,
+                    transform(content, filePath) {
+                        if (path.parse(filePath).base == 'service-worker.js') {
+                            return content
+                                .toString()
+                                .replace('{{version}}', `${package.version}-${crypto.randomBytes(8).toString('hex')}`)
+                        }
+                        return content;
+                    }
+                },
+                {
+                    from: '*.html',
+                    to: dstPathFull,
+                    context: 'src/',
+                },
             ],
         }),
         new CompressionPlugin,

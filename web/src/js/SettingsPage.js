@@ -4,6 +4,7 @@ export default class SettingsPage extends BasePage {
     settings = {};
 
     init() {
+        super.init();
         this._initControls();
         this._loadSettings();
     }

@@ -3,6 +3,7 @@ import Formatter from './Formatter';
 
 export default class LiveDataPage extends BasePage {
     init() {
+        super.init();
         this._initWebSocket();
     }
 
