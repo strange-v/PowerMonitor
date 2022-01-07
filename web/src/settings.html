@@ -57,7 +57,7 @@
 
             <div class="field">
                 <label for="mqttServer">Server</label>
-                <input type="text" id="mqttServer" placeholder="192.168.0.1:1883" maxlength="32"/>
+                <input type="text" id="mqttServer" placeholder="192.168.0.1:1883" maxlength="30"/>
             </div>
     
             <div class="field">
@@ -80,12 +80,12 @@
             
             <div class="field">
                 <label for="requestDataInterval">Request Data Interval (ms)</label>
-                <input type="number" id="requestDataInterval"/>
+                <input type="number" id="requestDataInterval" min="500"/>
             </div>
 
             <div class="field">
                 <label for="otaPassword">OTA password</label>
-                <input type="password" id="otaPassword" maxlength="30"/>
+                <input type="password" id="otaPassword" minlength="8" maxlength="30"/>
             </div>
         </form>
     </div>

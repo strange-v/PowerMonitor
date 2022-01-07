@@ -8,7 +8,7 @@ void initWebServer()
               { request->redirect("/power/index.html"); });
     server.on("/power/api/settings", HTTP_GET, _getSettings);
     server.on("/power/api/settings", HTTP_PUT, [](AsyncWebServerRequest *request){}, NULL, _saveSettings);
-        
+
     server.serveStatic("/power/", SPIFFS, "/");
     server.serveStatic("/power/images", SPIFFS, "/images");
     server.onNotFound(_notFound);
