@@ -78,8 +78,9 @@ export default class SettingsPage extends BasePage {
                 field.refs.forEach(ref => this._disableFiled(ref, !this._getFieldValue(el)));
             }
         });
-        document.getElementById('save').onclick = this._onSave.bind(this);
-        document.getElementById('form').addEventListener('submit', (event) => this._onSubmit(event), false)
+
+        document.getElementById('save').addEventListener('click', () => this._onSave(), false);
+        document.getElementById('form').addEventListener('submit', (event) => this._onSubmit(event), false);
     }
 
     _disableFiled(id, disabled) {
@@ -94,17 +95,17 @@ export default class SettingsPage extends BasePage {
         }
     }
 
-    _getFieldValue(field) {
-        if (field.type == 'text' || field.type == 'password')
-            return field.value;
-        else if (field.type == 'number')
-            return Number(field.value);
-        else if (field.type == 'checkbox')
-            return field.checked;
+    _getFieldValue(el) {
+        if (el.type == 'text' || el.type == 'password')
+            return el.value;
+        else if (el.type == 'number' || el.type == 'range')
+            return Number(el.value);
+        else if (el.type == 'checkbox')
+            return el.checked;
     }
 
     _setFieldValue(el, value) {
-        if (el.type == 'text' || el.type == 'number' || el.type == 'password')
+        if (el.type == 'text' || el.type == 'number' || el.type == 'password' || el.type == 'range')
             el.value = value;
         else if (el.type == 'checkbox')
             el.checked = value;

@@ -22,6 +22,7 @@ body {
     padding: 0 3% 0 24px;
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
     margin-bottom: 8px;
+    z-index: 10;
 
     .title {
         margin-right: auto;
@@ -122,6 +123,7 @@ form {
         padding: 8px 0;
     }
     .field {
+        position: relative;
         margin-bottom: 8px;
 
         &.disabled {
@@ -139,27 +141,32 @@ form {
                 margin-right: auto;
             }
         }
-    }
-    label {
-        display: inline-block;
-        padding: 4px 0px;
-        color: #bdbdbd;
-    }
-    input:not([type="checkbox"]) {
-        width: 100%;
-        font-size: 1em;
-        padding: 8px;
-        background-color: #1d1d1d;
-        border: none;
-        color: #fff;
-        box-sizing: border-box;
-    }
-    input[type="checkbox"] {
-        -ms-transform: scale(2); /* IE */
-        -moz-transform: scale(2); /* FF */
-        -webkit-transform: scale(2); /* Safari and Chrome */
-        -o-transform: scale(2); /* Opera */
-        transform: scale(2);
-        padding: 10px;
+        label {
+            display: inline-block;
+            padding: 4px 0px;
+            color: #bdbdbd;
+        }
+        input:not([type="checkbox"]) {
+            width: 100%;
+            font-size: 1em;
+            padding: 8px;
+            background-color: #1d1d1d;
+            border: none;
+            color: #fff;
+            box-sizing: border-box;
+        }
+        input[type="checkbox"] {
+            -ms-transform: scale(2); /* IE */
+            -moz-transform: scale(2); /* FF */
+            -webkit-transform: scale(2); /* Safari and Chrome */
+            -o-transform: scale(2); /* Opera */
+            transform: scale(2);
+            padding: 10px;
+        }
+        .value {
+            position: absolute;
+            top: 4px;
+            right: 0;
+        }
     }
 }

@@ -11,6 +11,7 @@ extern "C"
 #include <SPIFFS.h>
 #include <ArduinoJson.h>
 #include <Settings.h>
+#include <Module.h>
 #include <NodeData.h>
 
 #define CONTENT_TYPE_TEXT "text/plain"
@@ -24,6 +25,7 @@ extern AsyncWebServer server;
 extern AsyncWebSocket ws;
 extern EventGroupHandle_t eg;
 extern NodeData data;
+extern Settings moduleSettings;
 extern uint8_t dataBuffer[512];
 
 void initWebServer();

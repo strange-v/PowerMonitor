@@ -8,5 +8,7 @@ namespace Cfg
     const uint8_t pinSDA = 4;
     const uint8_t pinRX = 14;
     const uint8_t pinTX = 17;
+
+    const uint8_t screenBrightness = 1;
 }
 #endif

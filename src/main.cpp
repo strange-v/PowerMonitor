@@ -58,7 +58,7 @@ void setup()
   moduleSettings = getSettings();
 
   u8g2.begin();
-  u8g2.setContrast(10);
+  u8g2.setContrast(Cfg::screenBrightness);
   
   configureMqtt();
   WiFi.onEvent(WiFiEvent);

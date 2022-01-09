@@ -50,14 +50,14 @@ void _onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, Aws
     switch (type)
     {
     case WS_EVT_CONNECT:
-        Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+        debugPrintf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
         break;
     case WS_EVT_DISCONNECT:
-        Serial.printf("WebSocket client #%u disconnected\n", client->id());
+        debugPrintf("WebSocket client #%u disconnected\n", client->id());
         break;
     case WS_EVT_DATA:
         data[len] = 0;
-        Serial.printf("WebSocket message: %s\n", data);
+        debugPrintf("WebSocket message: %s\n", data);
         break;
     case WS_EVT_PONG:
     case WS_EVT_ERROR:
@@ -127,7 +127,19 @@ void _saveSettings(AsyncWebServerRequest *request, uint8_t *data, size_t len, si
     saveSettings(sett);
     request->send(200);
 
-    ESP.restart();
+    bool restartRequired = moduleSettings.enableMqtt != sett.enableMqtt
+        || strcmp(moduleSettings.mqttHost, sett.mqttHost) != 0
+        || strcmp(moduleSettings.mqttUser, sett.mqttUser) != 0
+        || strcmp(moduleSettings.mqttPassword, sett.mqttPassword) != 0
+        || strcmp(moduleSettings.mqttTopic, sett.mqttTopic) != 0
+        || strcmp(moduleSettings.otaPassword, sett.otaPassword) != 0;
+
+    if (restartRequired)
+    {
+        ESP.restart();
+    }
+
+    moduleSettings = getSettings();
 }
 
 void _notFound(AsyncWebServerRequest *request)
