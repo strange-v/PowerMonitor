@@ -1,0 +1,32 @@
+.app-dialog {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba($color: #000000, $alpha: .8);
+
+    .dialog {
+        margin: 0% 3% 0 3%;
+        padding: 16px;
+        background-color: #424242;
+        border-radius: 5px;
+
+        .title {
+            font-size: 1.2em;
+            margin-bottom: 16px;
+        }
+        .text {
+            margin-bottom: 16px;
+        }
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+
+            .button {
+                padding: 0 16px;
+                color: #bb86fc;
+            }
+        }
+    }
+}

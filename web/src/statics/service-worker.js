@@ -2,7 +2,6 @@ const cacheName = '{{version}}';
 const contentToCache = [
     '/power/',
     '/power/index.html',
-    '/power/settings.html',
     '/power/main.js',
     '/power/main.css',
     '/power/favicon.ico',

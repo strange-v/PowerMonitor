@@ -1,25 +1,13 @@
-<!DOCTYPE html>
-<html lang="en-US">
-
-<head>
-    <meta charset="UTF-8" />
-    <title>Power Meter</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/power/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/power/favicon-16x16.png">
-    <meta name="theme-color" content="#1f1f1f">
-    <link rel="stylesheet" href="/power/main.css" />
-    <link rel="manifest" href="/power/manifest.json" crossorigin="use-credentials">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
-    <script src="/power/main.js"></script>
-</head>
-
-<body>
+<div class="live-data-page">
     <div class="header">
         <div class="title">Power Monitoring</div>
-        <a href="/power/settings.html" class="button settings"></a>
+        <div id="btn-menu" class="button menu">
+            <i class="icon menu"></i>
+            <!-- <ul class="menu">
+                <li><a id="reset-energy"><i class="icon reset"></i> Reset Energy</a></li>
+                <li><a id="settings"><i class="icon settings"></i> Settings</a></li>
+            </ul> -->
+        </div>
     </div>
     <div id="app-spinner"></div>
     <div id="content">
@@ -58,7 +46,4 @@
     <div id="notification" class="notification">
         <div id="notification-text" class="text"></div>
     </div>
-    <script>(new LiveDataPage).init();</script>
-</body>
-
-</html>
+</div>

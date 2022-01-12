@@ -8,6 +8,7 @@ void initWebServer()
               { request->redirect("/power/index.html"); });
     server.on("/power/api/settings", HTTP_GET, _getSettings);
     server.on("/power/api/settings", HTTP_PUT, [](AsyncWebServerRequest *request){}, NULL, _saveSettings);
+    server.on("/power/api/resetEnergy", HTTP_POST, _resetEnergy);
 
     server.serveStatic("/power/", SPIFFS, "/");
     server.serveStatic("/power/images", SPIFFS, "/images");
@@ -140,6 +141,12 @@ void _saveSettings(AsyncWebServerRequest *request, uint8_t *data, size_t len, si
     }
 
     moduleSettings = getSettings();
+}
+
+void _resetEnergy(AsyncWebServerRequest *request)
+{
+    //resetEnergy();
+    request->send(200);
 }
 
 void _notFound(AsyncWebServerRequest *request)

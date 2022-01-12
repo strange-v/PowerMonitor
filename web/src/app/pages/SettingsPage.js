@@ -1,10 +1,12 @@
 import BasePage from "./BasePage";
+import html from './SettingsPage.html';
+import scss from './SettingsPage.scss';
 
 export default class SettingsPage extends BasePage {
     settings = {};
 
     init() {
-        super.init();
+        super.init(html);
         this._initControls();
         this._loadSettings();
     }

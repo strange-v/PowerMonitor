@@ -1,0 +1,77 @@
+<div class="settings-page">
+    <div class="header">
+        <a href="/power/#/" class="button"><i class="icon back"></i></a>
+        <div class="title">Power Monitoring</div>
+        <a id="save" class="button"><i class="icon save"></i></a>
+    </div>
+    <div id="app-spinner"></div>
+    <div id="content">
+        <form id="form" class="form">
+            <div class="sub-header">Limits</div>
+    
+            <div class="field">
+                <label for="voltageMin">Voltage Min (V)</label>
+                <input type="number" id="voltageMin" min="0" />
+            </div>
+    
+            <div class="field">
+                <label for="voltageMax">Voltage Max (V)</label>
+                <input type="number" id="voltageMax" min="0" />
+            </div>
+    
+            <div class="field">
+                <label for="powerMax">Power Max (W)</label>
+                <input type="number" id="powerMax" min="0" />
+            </div>
+    
+            <div class="field">
+                <label for="currentMax">Current Max (A)</label>
+                <input type="number" id="currentMax" min="0" />
+            </div>
+    
+    
+            <div class="sub-header">MQTT Settings</div>
+    
+            <div class="field checkbox">
+                <input type="checkbox" id="enableMqtt" />
+                <label for="enableMqtt">Enable Mqtt</label>
+            </div>
+    
+            <div class="field">
+                <label for="mqttServer">Server</label>
+                <input type="text" id="mqttServer" placeholder="192.168.0.1:1883" maxlength="30" />
+            </div>
+    
+            <div class="field">
+                <label for="mqttUser">User</label>
+                <input type="text" id="mqttUser" maxlength="30" />
+            </div>
+    
+            <div class="field">
+                <label for="mqttPassword">Pasword</label>
+                <input type="password" id="mqttPassword" maxlength="30" />
+            </div>
+    
+            <div class="field">
+                <label for="mqttTopic">Topic</label>
+                <input type="text" id="mqttTopic" maxlength="30" />
+            </div>
+    
+    
+            <div class="sub-header">System</div>
+    
+            <div class="field">
+                <label for="requestDataInterval">Request Data Interval (ms)</label>
+                <input type="number" id="requestDataInterval" min="500" />
+            </div>
+    
+            <div class="field">
+                <label for="otaPassword">OTA password</label>
+                <input type="password" id="otaPassword" minlength="8" maxlength="30" />
+            </div>
+        </form>
+    </div>
+    <div id="notification" class="notification">
+        <div id="notification-text" class="text"></div>
+    </div>
+</div>

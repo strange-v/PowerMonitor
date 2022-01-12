@@ -1,36 +1,18 @@
-export default class BasePage {
-    loading = true;
-
-    init() {
+export default {
+    checkForUpdate() {
         const msgUpdate = 'New Update available! Please, reload the webapp to see the latest changes.';
-
+        
         this._isUpdateAvailable()
             .then(isAvailable => {
                 if (isAvailable)
-                    this.showNotification(msgUpdate);
+                    this._showNotification(msgUpdate);
             });
-    }
-
-    showContent() {
-        if (this.loading) {
-            this.loading = false;
-            document.getElementById('content').style.display = 'block';
-            document.getElementById('app-spinner').style.display = 'none';
-        }
-    }
-
-    showLoading() {
-        if (!this.loading) {
-            this.loading = true;
-            document.getElementById('content').style.display = 'none';
-            document.getElementById('app-spinner').style.display = 'block';
-        }
-    }
-
-    showNotification(text) {
+    },
+    
+    _showNotification(text) {
         document.getElementById('notification').style.display = 'block';
         document.getElementById('notification-text').innerText = text;
-    }
+    },
 
     _isUpdateAvailable() {
         return new Promise(function (resolve, reject) {

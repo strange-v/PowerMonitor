@@ -12,6 +12,7 @@ extern "C"
 #include <ArduinoJson.h>
 #include <Settings.h>
 #include <Module.h>
+#include <Pzem.h>
 #include <NodeData.h>
 
 #define CONTENT_TYPE_TEXT "text/plain"
@@ -33,6 +34,7 @@ void taskUpdateWebClients(void *pvParameters);
 void _onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
 void _getSettings(AsyncWebServerRequest *request);
 void _saveSettings(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);
+void _resetEnergy(AsyncWebServerRequest *request);
 void _notFound(AsyncWebServerRequest *request);
 
 #endif

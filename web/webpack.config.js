@@ -6,6 +6,7 @@ const path = require('path'),
     CopyPlugin = require("copy-webpack-plugin"),
     CompressionPlugin = require('compression-webpack-plugin'),
     MiniCssExtractPlugin = require('mini-css-extract-plugin'),
+    HtmlWebpackPlugin = require('html-webpack-plugin'),
     RemovePlugin = require('remove-files-webpack-plugin'),
     MiniSvgDataPlugin = require('mini-svg-data-uri'),
     package = require('./package.json'),
@@ -29,6 +30,11 @@ const config = {
         main: './src/index.js',
     },
     mode: mode,
+    resolve: {
+        alias: {
+            'app': path.resolve(__dirname, './src/app'),
+        }
+    },
     output: {
         path: dstPathFull,
         publicPath: '/power/',
@@ -66,6 +72,10 @@ const config = {
                     'sass-loader'
                 ],
             },
+            {
+                test: /\.html$/,
+                use: 'html-loader'
+            },
         ],
     },
     plugins: [
@@ -83,15 +93,27 @@ const config = {
                         return content;
                     }
                 },
-                {
-                    from: '*.html',
-                    to: dstPathFull,
-                    context: 'src/',
-                },
             ],
         }),
         new CompressionPlugin,
         new MiniCssExtractPlugin,
+        new HtmlWebpackPlugin({
+            title: 'Power Monitor',
+            templateContent: `
+            <html>
+                <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1" />
+                    <link rel="icon" type="image/png" sizes="32x32" href="/power/favicon-32x32.png">
+                    <link rel="icon" type="image/png" sizes="16x16" href="/power/favicon-16x16.png">
+                    <meta name="theme-color" content="#1f1f1f">
+                    <link rel="manifest" href="/power/manifest.json" crossorigin="use-credentials">
+                </head>
+                <body>
+                    <div id="app"></div>
+                </body>
+            </html>
+            `
+        }),
     ],
 };
 
