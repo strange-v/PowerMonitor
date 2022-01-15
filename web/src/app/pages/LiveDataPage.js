@@ -83,9 +83,9 @@ export default class LiveDataPage extends BasePage {
 
         power.innerText = Formatter.power(data.p);
         current.innerText = Formatter.current(data.c);
-        voltage.innerText = `${data.v} V`;
-        frequency.innerText = `${data.f} Hz`;
-        pf.innerText = `${data.pf}`;
+        voltage.innerText = Formatter.voltage(data.v);
+        frequency.innerText = Formatter.frequency(data.f);
+        pf.innerText = Formatter.powerFactor(data.pf);
         energy.innerText = Formatter.energy(data.e);
         uptime.innerText = Formatter.uptime(data.u);
 

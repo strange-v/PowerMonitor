@@ -30,3 +30,11 @@ void WiFiEvent(WiFiEvent_t event)
     break;
   }
 }
+
+void conectNetwork()
+{
+  if (!ethConnected)
+  {
+    ETH.begin();
+  }
+}

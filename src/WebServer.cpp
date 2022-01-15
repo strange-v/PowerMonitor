@@ -29,21 +29,26 @@ void taskUpdateWebClients(void *pvParameters)
         StaticJsonDocument<256> doc;
         char buffer[256];
 
-        doc["v"] = data.voltage;
+        doc["v"] = round2(data.voltage);
         doc["vw"] = data.voltageWarn;
-        doc["f"] = data.frequency;
-        doc["p"] = data.power;
+        doc["f"] = round2(data.frequency);
+        doc["p"] = round2(data.power);
         doc["pw"] = data.powerWarn;
-        doc["c"] = data.current;
+        doc["c"] = round2(data.current);
         doc["cw"] = data.currentWarn;
-        doc["pf"] = data.pf;
-        doc["e"] = data.energy;
+        doc["pf"] = round2(data.pf);
+        doc["e"] = round2(data.energy);
         doc["u"] = data.uptime;
 
         serializeJson(doc, buffer);
 
         ws.textAll(buffer);
     }
+}
+
+void cleanupWebSockets()
+{
+    ws.cleanupClients();
 }
 
 void _onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)

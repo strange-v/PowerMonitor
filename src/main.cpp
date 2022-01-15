@@ -31,6 +31,8 @@ SemaphoreHandle_t sema_PZEM;
 QueueHandle_t qMqtt;
 TimerHandle_t tRequestData;
 TimerHandle_t tConectMqtt;
+TimerHandle_t tConectNetwork;
+TimerHandle_t tCleanupWebSockets;
 
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE, Cfg::pinSCL, Cfg::pinSDA);
 PZEM004Tv30 pzem(Serial1, Cfg::pinRX, Cfg::pinTX);
@@ -68,22 +70,24 @@ void setup()
   ArduinoOTA.begin();
 
   xTaskCreatePinnedToCore(taskRetrieveData, "RetrieveData", TaskStack10K, NULL, Priority3, NULL, Core1);
-  xTaskCreatePinnedToCore(taskUpdateDisplay, "UpdateDisplay", TaskStack15K, NULL, Priority3, NULL, Core1);
+  xTaskCreatePinnedToCore(taskUpdateDisplay, "UpdateDisplay", TaskStack10K, NULL, Priority3, NULL, Core1);
   xTaskCreatePinnedToCore(taskUpdateWebClients, "UpdateWebClients", TaskStack10K, NULL, Priority3, NULL, Core1);
   xTaskCreatePinnedToCore(taskSendMqttMessages, "tMqtt", TaskStack10K, NULL, Priority2, NULL, Core1);
   tRequestData = xTimerCreate("RequestData", pdMS_TO_TICKS(moduleSettings.requestDataInterval), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(requestData));
   tConectMqtt = xTimerCreate("ConectMqtt", pdMS_TO_TICKS(10000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
+  tConectNetwork = xTimerCreate("ConectNetwork", pdMS_TO_TICKS(20000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(conectNetwork));
+  tCleanupWebSockets = xTimerCreate("CleanupWebSockets", pdMS_TO_TICKS(1000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(cleanupWebSockets));
 
   initWebServer();
 
   xTimerStart(tRequestData, 0);
+  xTimerStart(tConectNetwork, 0);
+  xTimerStart(tCleanupWebSockets, 0);
 }
 
 void loop()
 {
   ArduinoOTA.handle();
-  //ToDo: Do this in timer
-  ws.cleanupClients();
 }
 
 void requestData()

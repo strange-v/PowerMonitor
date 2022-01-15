@@ -13,5 +13,6 @@ extern "C"
 extern bool ethConnected;
 
 void WiFiEvent(WiFiEvent_t event);
+void conectNetwork();
 
 #endif

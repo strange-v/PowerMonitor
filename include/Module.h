@@ -18,5 +18,6 @@
 void debugPrint(const char* text);
 void debugPrintf(const char *format, ...);
 void debugPrint(const IPAddress ip);
+double round2(double value);
 
 #endif

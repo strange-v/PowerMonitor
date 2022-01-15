@@ -24,6 +24,9 @@ export default class Formatter {
     }
     static power = (v) => this.autoNumber(v, 1, ['W', 'KW', 'MW'])
     static current = (v) => this.autoNumber(v, 2, ['A', 'kA'])
+    static voltage = (v) => this.autoNumber(v, 1, ['V', 'kV'])
+    static frequency = (v) => this.autoNumber(v, 1, ['Hz', 'kHz'])
+    static powerFactor = (v) => this.number(v, 2)
     static energy = (v) => this.autoNumber(v, 1, ['kWh', 'MWh'])
     static autoNumber = (value, scale, units) => {
         let unitText = '';
