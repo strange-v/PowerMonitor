@@ -2,6 +2,7 @@
 #define MODULE_h
 
 #include <Arduino.h>
+#include <time.h>
 
 #define TaskStack10K 10000
 #define TaskStack15K 15000

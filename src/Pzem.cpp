@@ -27,15 +27,18 @@ void taskRetrieveData(void *pvParameters)
 
             xEventGroupSetBits(eg, EVENT_UPDATE_DISPLAY | EVENT_UPDATE_WEB_CLIENTS);
 
+            // ToDo: Probably move to a separate task
             if (moduleSettings.enableMqtt)
             {
-                MqttMessage msg = composeMessage(data);
+                MqttMessage msg = composeMqttMessage(data);
                 if (xQueueSendToBack(qMqtt, &msg, QUEUE_RECEIVE_DELAY) != pdPASS)
                 {
                     debugPrint("Failed to add to the mqtt queue");
                 }
             }
-            
+
+            // ToDo: Probably move to a separate task
+            tempChartBuffer.push({data.voltage, data.power});
         }
     }
 }

@@ -8,7 +8,9 @@ extern "C"
 #include "freertos/timers.h"
 }
 #include <PZEM004Tv30.h>
+#include <CircularBuffer.h>
 #include <NodeData.h>
+#include <ChartData.h>
 #include <Display.h>
 #include <WebServer.h>
 #include <Mqtt.h>
@@ -22,6 +24,8 @@ extern SemaphoreHandle_t sema_PZEM;
 extern PZEM004Tv30 pzem;
 extern NodeData data;
 extern Settings moduleSettings;
+extern CircularBuffer<ChartData, 720> chartBuffer;
+extern CircularBuffer<TempChartData, 60> tempChartBuffer;
 
 void taskRetrieveData(void *pvParameters);
 bool resetEnergy();

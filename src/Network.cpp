@@ -16,6 +16,8 @@ void WiFiEvent(WiFiEvent_t event)
     debugPrint(ETH.localIP());
 
     ethConnected = true;
+    initOta();
+    initTime();
     connectToMqtt();
     break;
   case SYSTEM_EVENT_ETH_DISCONNECTED:
@@ -37,4 +39,10 @@ void conectNetwork()
   {
     ETH.begin();
   }
+}
+
+void initOta()
+{
+  ArduinoOTA.setPassword(moduleSettings.otaPassword);
+  ArduinoOTA.begin();
 }

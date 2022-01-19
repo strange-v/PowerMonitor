@@ -1,4 +1,4 @@
-import BasePage from "./BasePage";
+import BasePage from "app/pages/BasePage";
 import html from './SettingsPage.html';
 import scss from './SettingsPage.scss';
 

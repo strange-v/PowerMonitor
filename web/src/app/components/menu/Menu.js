@@ -14,6 +14,10 @@ export default class Menu {
         this._initMenuItems();
     }
 
+    destroy() {
+        this.removeAllListeners();
+    }
+
     show() {
         if (!this._rendered) {
             this._rendered = true;

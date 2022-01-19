@@ -2,6 +2,11 @@
     "files.associations": {
         "numeric": "cpp",
         "bitset": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "ctime": "cpp",
+        "sstream": "cpp",
+        "regex": "cpp",
+        "random": "cpp",
+        "*.tpp": "cpp"
     }
 }

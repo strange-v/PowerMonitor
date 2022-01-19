@@ -33,7 +33,7 @@ void connectToMqtt();
 void taskSendMqttMessages(void *pvParameters);
 void onMqttConnect(bool sessionPresent);
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason);
-MqttMessage composeMessage(NodeData data);
+MqttMessage composeMqttMessage(NodeData data);
 uint16_t _mqttPublish(const char *topic, const char *data);
 
 #endif

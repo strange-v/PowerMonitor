@@ -73,6 +73,13 @@ const config = {
                 ],
             },
             {
+                test: /\.css$/i,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
+                ],
+            },
+            {
                 test: /\.html$/,
                 use: 'html-loader'
             },
@@ -102,7 +109,7 @@ const config = {
             templateContent: `
             <html>
                 <head>
-                    <meta name="viewport" content="width=device-width, initial-scale=1" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
                     <link rel="icon" type="image/png" sizes="32x32" href="/power/favicon-32x32.png">
                     <link rel="icon" type="image/png" sizes="16x16" href="/power/favicon-16x16.png">
                     <meta name="theme-color" content="#1f1f1f">

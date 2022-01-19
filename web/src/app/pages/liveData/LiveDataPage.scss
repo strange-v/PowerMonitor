@@ -13,6 +13,9 @@
             box-sizing: border-box;
             border-radius: 5px;
         
+            &.clickable {
+                cursor: pointer;
+            }
             &.warning {
                 background-color: #cf6679;
                 color: #000;

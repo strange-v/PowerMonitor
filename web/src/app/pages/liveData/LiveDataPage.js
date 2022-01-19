@@ -1,29 +1,17 @@
-import BasePage from './BasePage';
-import Formatter from '../utils/Formatter';
-import WebSocketWrapper from '../utils/WebSocketWrapper';
-import Confirmation from '../components/confirmation/Confirmation';
-import Menu from '../components/menu/Menu';
 import html from './LiveDataPage.html';
 import scss from './LiveDataPage.scss';
+import BasePage from 'app/pages/BasePage';
+import Formatter from 'app//utils/Formatter';
+import WebSocketWrapper from 'app//utils/WebSocketWrapper';
+import Confirmation from 'app//components/confirmation/Confirmation';
+import Menu from 'app/components/menu/Menu';
+import { POWER, VOLTAGE } from '../chart/ChartType'
 
 export default class LiveDataPage extends BasePage {
     init() {
         super.init(html);
         this._initWebSocket();
-
-        this._menu = new Menu({
-            el: document.getElementById('btn-menu'),
-            items: [{
-                text: 'Reset Energy',
-                iconCls: 'reset',
-                handler: this._onResetEnergyClick
-            }, {
-                text: 'Settings',
-                iconCls: 'settings',
-                handler: this._onSettingsClick
-            }],
-            scope: this
-        });
+        this._initControls();
     }
 
     destroy() {
@@ -105,5 +93,28 @@ export default class LiveDataPage extends BasePage {
             voltage.parentElement.classList.remove('warning');
 
         this.showContent();
+    }
+
+    _openChart(type) {
+        this.redirectTo(`/chart/${type}`);
+    }
+
+    _initControls() {
+        this._menu = new Menu({
+            el: document.getElementById('btn-menu'),
+            items: [{
+                text: 'Reset Energy',
+                iconCls: 'reset',
+                handler: this._onResetEnergyClick
+            }, {
+                text: 'Settings',
+                iconCls: 'settings',
+                handler: this._onSettingsClick
+            }],
+            scope: this
+        });
+
+        this.addListener('power-card', 'click', () => this._openChart(POWER));
+        this.addListener('voltage-card', 'click', () => this._openChart(VOLTAGE));
     }
 }

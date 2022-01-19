@@ -50,7 +50,7 @@ void onMqttDisconnect(AsyncMqttClientDisconnectReason reason)
     xTimerStart(tConectMqtt, TICKS_TO_WAIT12);
 }
 
-MqttMessage composeMessage(NodeData data)
+MqttMessage composeMqttMessage(NodeData data)
 {
     MqttMessage msg;
     StaticJsonDocument<256> doc;
