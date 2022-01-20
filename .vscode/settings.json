@@ -7,6 +7,18 @@
         "sstream": "cpp",
         "regex": "cpp",
         "random": "cpp",
-        "*.tpp": "cpp"
+        "*.tpp": "cpp",
+        "array": "cpp",
+        "*.tcc": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "exception": "cpp",
+        "string_view": "cpp",
+        "functional": "cpp",
+        "iomanip": "cpp",
+        "istream": "cpp",
+        "limits": "cpp",
+        "ostream": "cpp",
+        "streambuf": "cpp"
     }
 }

@@ -7,8 +7,7 @@ void initWebServer()
     server.on("/power/", HTTP_GET, [](AsyncWebServerRequest *request)
               { request->redirect("/power/index.html"); });
     server.on("/power/api/settings", HTTP_GET, _getSettings);
-    server.on(
-        "/power/api/settings", HTTP_PUT, [](AsyncWebServerRequest *request) {}, NULL, _saveSettings);
+    server.on("/power/api/settings", HTTP_PUT, [](AsyncWebServerRequest *request) {}, NULL, _saveSettings);
     server.on("/power/api/resetEnergy", HTTP_POST, _resetEnergy);
     server.on("/power/api/chart", HTTP_GET, _getChartData);
     server.on("/power/api/debug", HTTP_GET, _getDebug);
@@ -32,16 +31,16 @@ void taskUpdateWebClients(void *pvParameters)
         StaticJsonDocument<256> doc;
         char buffer[256];
 
-        doc["v"] = round2(data.voltage);
-        doc["vw"] = data.voltageWarn;
-        doc["f"] = round2(data.frequency);
-        doc["p"] = round2(data.power);
-        doc["pw"] = data.powerWarn;
-        doc["c"] = round2(data.current);
-        doc["cw"] = data.currentWarn;
-        doc["pf"] = round2(data.pf);
-        doc["e"] = round2(data.energy);
-        doc["u"] = data.uptime;
+        doc["v"] = round2(currentData.voltage);
+        doc["vw"] = currentData.voltageWarn;
+        doc["f"] = round2(currentData.frequency);
+        doc["p"] = round2(currentData.power);
+        doc["pw"] = currentData.powerWarn;
+        doc["c"] = round2(currentData.current);
+        doc["cw"] = currentData.currentWarn;
+        doc["pf"] = round2(currentData.pf);
+        doc["e"] = round2(currentData.energy);
+        doc["u"] = currentData.uptime;
 
         serializeJson(doc, buffer);
 
@@ -49,50 +48,58 @@ void taskUpdateWebClients(void *pvParameters)
     }
 }
 
-void cleanupWebSockets()
-{
-    ws.cleanupClients();
-}
-
-// ToDo: Should be a separate task
-void handleChartCalcs()
+void taskChartCalcs(void *pvParameters)
 {
     time_t now;
     tm local;
-    time(&now);
-    localtime_r(&now, &local);
+    ChartData cd;
 
-    ChartData chartData;
-    chartData.date = 0;
-    // ToDo: Optimize this
-    chartData.date = static_cast<uint8_t>(local.tm_mday);
-    chartData.date = chartData.date << 8 | static_cast<uint8_t>(local.tm_hour);
-    chartData.date = chartData.date << 8 | static_cast<uint8_t>(local.tm_min);
-
-    float maxVoltage = tempChartBuffer[0].voltage;
-    float minVoltage = tempChartBuffer[0].voltage;
-    float maxPower = tempChartBuffer[0].power;
-    float minPower = tempChartBuffer[0].power;
-    using index_t = decltype(tempChartBuffer)::index_t;
-    for (index_t i = 0; i < tempChartBuffer.size(); i++)
+    for (;;)
     {
-        if (maxVoltage < tempChartBuffer[i].voltage)
-            maxVoltage = tempChartBuffer[i].voltage;
-        if (minVoltage > tempChartBuffer[i].voltage)
-            minVoltage = tempChartBuffer[i].voltage;
-        
-        if (maxPower < tempChartBuffer[i].power)
-            maxPower = tempChartBuffer[i].power;
-        if (minPower > tempChartBuffer[i].power)
-            minPower = tempChartBuffer[i].power;
-    }
-    tempChartBuffer.clear();
+        xEventGroupWaitBits(eg, EVENT_UPDATE_CHART, pdTRUE, pdTRUE, portMAX_DELAY);
 
-    chartData.minVoltage = round2(minVoltage);
-    chartData.maxVoltage = round2(maxVoltage);
-    chartData.minPower = round2(minPower);
-    chartData.maxPower = round2(maxPower);
-    chartBuffer.push(chartData);
+        time(&now);
+        localtime_r(&now, &local);
+
+        // ToDo: Optimize this
+        cd.date = static_cast<uint8_t>(local.tm_mday);
+        cd.date = cd.date << 8 | static_cast<uint8_t>(local.tm_hour);
+        cd.date = cd.date << 8 | static_cast<uint8_t>(local.tm_min);
+
+        float maxVoltage = tempData[0].voltage;
+        float minVoltage = tempData[0].voltage;
+        float maxPower = tempData[0].power;
+        float minPower = tempData[0].power;
+        for (decltype(tempData)::index_t i = 0; i < tempData.size(); i++)
+        {
+            if (maxVoltage < tempData[i].voltage)
+                maxVoltage = tempData[i].voltage;
+            if (minVoltage > tempData[i].voltage)
+                minVoltage = tempData[i].voltage;
+            
+            if (maxPower < tempData[i].power)
+                maxPower = tempData[i].power;
+            if (minPower > tempData[i].power)
+                minPower = tempData[i].power;
+        }
+        tempData.clear();
+
+        cd.minVoltage = minVoltage;
+        cd.maxVoltage = maxVoltage;
+        cd.minPower = minPower;
+        cd.maxPower = maxPower;
+        
+        if (xSemaphoreTake(semaHistoricalData, pdMS_TO_TICKS(10000)) == pdTRUE)
+        {
+            historicalData.push(cd);
+            xSemaphoreGive(semaHistoricalData);
+        }
+    }
+}
+
+void cleanupWebSockets()
+{
+    ws.cleanupClients();
 }
 
 void _onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
@@ -135,19 +142,32 @@ void _getSettings(AsyncWebServerRequest *request)
     webDoc["rdi"] = data.requestDataInterval;
     webDoc["otaPwd"] = data.otaPassword;
 
-    // AsyncResponseStream *response = request->beginResponseStream(CONTENT_TYPE_JSON);
-    // serializeJson(webDoc, response);
-    serializeJson(webDoc, webDataBuffer);
-    request->send(200, CONTENT_TYPE_JSON, webDataBuffer);
+    if (xSemaphoreTake(semaWebDataBuffer, TICKS_TO_WAIT0) == pdTRUE)
+    {
+        serializeJson(webDoc, webDataBuffer);
+        request->send(200, CONTENT_TYPE_JSON, webDataBuffer);
+        
+        xSemaphoreGive(semaWebDataBuffer);
+    }
+    else
+    {
+        request->redirect(request->url().c_str());
+    }
 }
 
 void _saveSettings(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total)
 {
-    if (total > sizeof(webDataBuffer))
+    if (index == 0)
     {
-        request->send(500, CONTENT_TYPE_TEXT, "Content is to big");
-        return;
+        request->_tempObject = new uint8_t(0);
+        if (xSemaphoreTake(semaWebDataBuffer, TICKS_TO_WAIT0) == pdTRUE)
+            *(uint8_t*)request->_tempObject = 1;
+        else
+            request->redirect(request->url().c_str());
     }
+
+    if (*(uint8_t*)request->_tempObject == 0)
+        return;
 
     memcpy(webDataBuffer + index, data, len);
 
@@ -174,6 +194,8 @@ void _saveSettings(AsyncWebServerRequest *request, uint8_t *data, size_t len, si
     strlcpy(sett.otaPassword, webDoc["otaPwd"].as<const char *>(), sizeof(sett.otaPassword));
 
     saveSettings(sett);
+
+    xSemaphoreGive(semaWebDataBuffer);
     request->send(200);
 
     bool restartRequired = moduleSettings.enableMqtt != sett.enableMqtt || strcmp(moduleSettings.mqttHost, sett.mqttHost) != 0 || strcmp(moduleSettings.mqttUser, sett.mqttUser) != 0 || strcmp(moduleSettings.mqttPassword, sett.mqttPassword) != 0 || strcmp(moduleSettings.mqttTopic, sett.mqttTopic) != 0 || strcmp(moduleSettings.otaPassword, sett.otaPassword) != 0;
@@ -199,39 +221,89 @@ void _getChartData(AsyncWebServerRequest *request)
     if(!request->hasParam("type"))
     {
         request->send(500, CONTENT_TYPE_TEXT, "No type");
+        return;
     }
 
-    char lineBuffer[32];
-    strcpy(webDataBuffer, "[");
-    
-    for (decltype(chartBuffer)::index_t i = 0; i < chartBuffer.size(); i++)
+    bool needRetry = false;
+    AsyncWebParameter* type = request->getParam("type");
+    if (xSemaphoreTake(semaHistoricalData, TICKS_TO_WAIT0) == pdTRUE)
     {
-        ChartData data = chartBuffer[i];
-        sprintf(lineBuffer, "[%u,%.2f,%.2f],", data.date, _getMinValueByType(request->getParam("type"), data), _getMaxValueByType(request->getParam("type"), data));
-        strcat(webDataBuffer, lineBuffer);
+        if (xSemaphoreTake(semaWebDataBuffer, TICKS_TO_WAIT0) == pdTRUE)
+        {
+            AsyncWebServerResponse *response = request->beginChunkedResponse(CONTENT_TYPE_JSON, [type](uint8_t *buffer, size_t maxLen, size_t index) -> size_t
+            {
+                char lineBuffer[64];
+                size_t max = (maxLen > sizeof(webDataBuffer) ? sizeof(webDataBuffer) : maxLen) - 4;
+                size_t copied = 0;
+                size_t skipped = 0;
+                size_t lineLen = 0;
+
+                webDataBuffer[0] = '\0';
+                if (index == 0)
+                {
+                    strcpy(webDataBuffer, "[");
+                    copied++;
+                }
+                else
+                    skipped++;
+
+                for (decltype(historicalData)::index_t i = 0; i < historicalData.size(); i++)
+                {
+                    ChartData data = historicalData[i];
+                    lineLen = sprintf(lineBuffer, "[%u,%.2f,%.2f],", data.date, _getMinValueByType(type, data), _getMaxValueByType(type, data));
+
+                    if (index > 0 && skipped + lineLen <= index)
+                    {
+                        skipped += lineLen;
+                        continue;
+                    }
+
+                    if (copied + lineLen > max)
+                    {
+                        memcpy(buffer, webDataBuffer, copied);
+                        return copied;
+                    }
+
+                    strcat(webDataBuffer, lineBuffer);
+                    copied += lineLen;
+                }
+
+                if (copied == 0 && index > 0)
+                {
+                    xSemaphoreGive(semaWebDataBuffer);
+                    xSemaphoreGive(semaHistoricalData);
+                    return 0;
+                }
+
+                if (strlen(webDataBuffer) > 1)
+                    webDataBuffer[strlen(webDataBuffer) - 1] = '\0';
+                else
+                    copied++;
+
+                strcat(webDataBuffer, "]");
+
+                memcpy(buffer, webDataBuffer, copied);
+                return copied;
+            });
+            request->send(response);
+        }
+        else
+        {
+            xSemaphoreGive(semaHistoricalData);
+            needRetry = true;
+        }
+    }
+    else
+    {
+        needRetry = true;
     }
 
-    if (chartBuffer.size() > 0)
-        webDataBuffer[strlen(webDataBuffer) - 1] = '\0';
-    strcat(webDataBuffer, "]");
-
-    // ToDo: Think about streaming data from the circular buffer directly into the response in a similar way
-    // AsyncWebServerResponse *response = request->beginChunkedResponse(CONTENT_TYPE_JSON, [](uint8_t *buffer, size_t maxLen, size_t index) -> size_t
-    // {
-    //     uint16_t total = strlen(webDataBuffer);
-    //     if (index >= total)
-    //         return 0;
-
-    //     size_t max = 2048;
-    //     size_t maxLenToCopy = maxLen > max ? max : maxLen;
-    //     size_t lenToCopy = total - index > maxLenToCopy ? maxLenToCopy : total - index;
-
-    //     memcpy(buffer, webDataBuffer + index, lenToCopy);
-    //     return lenToCopy;
-    // });
-    // request->send(response);
-    
-    request->send(200, CONTENT_TYPE_JSON, webDataBuffer);
+    if (needRetry)
+    {
+        char buffer[64];
+        sprintf(buffer, "%s?type=%s", request->url().c_str(), type->value().c_str());
+        request->redirect(buffer);
+    }
 }
 
 void _getDebug(AsyncWebServerRequest *request)
@@ -248,8 +320,17 @@ void _getDebug(AsyncWebServerRequest *request)
     int month = info.tm_mon + 1;
     int year = info.tm_year + 1900;
 
-    sprintf(webDataBuffer, "HEAP: %d, NOW: %02d.%02d.%d %02d:%02d:%02d\n", ESP.getFreeHeap(), day, month, year, hour, minute, second);
-    request->send(200, CONTENT_TYPE_TEXT, webDataBuffer);
+    if (xSemaphoreTake(semaWebDataBuffer, TICKS_TO_WAIT0) == pdTRUE)
+    {
+        sprintf(webDataBuffer, "HEAP: %d, NOW: %02d.%02d.%d %02d:%02d:%02d\n", ESP.getFreeHeap(), day, month, year, hour, minute, second);
+        request->send(200, CONTENT_TYPE_TEXT, webDataBuffer);
+        
+        xSemaphoreGive(semaWebDataBuffer);
+    }
+    else
+    {
+        request->redirect(request->url().c_str());
+    }
 }
 
 void _notFound(AsyncWebServerRequest *request)

@@ -14,6 +14,7 @@
 #define Core0 0
 #define Core1 1
 #define QUEUE_RECEIVE_DELAY 10
+#define TICKS_TO_WAIT0 0
 #define TICKS_TO_WAIT12 12
 
 void debugPrint(const char* text);

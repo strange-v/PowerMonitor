@@ -24,21 +24,25 @@ extern "C"
 #define CONTENT_TYPE_JS "text/javascript"
 #define CONTENT_TYPE_JSON "application/json"
 #define EVENT_UPDATE_WEB_CLIENTS (1 << 20)
+#define EVENT_UPDATE_CHART (1 << 21)
 
 extern AsyncWebServer server;
 extern AsyncWebSocket ws;
 extern EventGroupHandle_t eg;
-extern CircularBuffer<ChartData, 720> chartBuffer;
-extern CircularBuffer<TempChartData, 60> tempChartBuffer;
-extern NodeData data;
-extern Settings moduleSettings;
-extern char webDataBuffer[40960];
+
+extern CircularBuffer<ChartData, 720> historicalData;
+extern SemaphoreHandle_t semaHistoricalData;
+extern CircularBuffer<TempChartData, 60> tempData;
 extern StaticJsonDocument<2048> webDoc;
+extern char webDataBuffer[4096];
+extern SemaphoreHandle_t semaWebDataBuffer;
+extern NodeData currentData;
+extern Settings moduleSettings;
 
 void initWebServer();
 void taskUpdateWebClients(void *pvParameters);
+void taskChartCalcs(void *pvParameters);
 void cleanupWebSockets();
-void handleChartCalcs();
 void _onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
 void _getSettings(AsyncWebServerRequest *request);
 void _saveSettings(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);

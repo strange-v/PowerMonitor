@@ -19,7 +19,7 @@ extern QueueHandle_t qMqtt;
 extern AsyncMqttClient mqtt;
 extern TimerHandle_t tConectMqtt;
 extern bool ethConnected;
-extern NodeData data;
+extern NodeData currentData;
 extern Settings moduleSettings;
 
 struct MqttMessage

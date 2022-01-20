@@ -28,9 +28,9 @@ extern "C"
 #include <Cfg.h>
 
 void requestData();
+void requestChartUpdate();
 
 EventGroupHandle_t eg;
-SemaphoreHandle_t sema_PZEM;
 QueueHandle_t qMqtt;
 TimerHandle_t tRequestData;
 TimerHandle_t tConectMqtt;
@@ -41,18 +41,21 @@ TimerHandle_t tHandleChartCalcs;
 
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE, Cfg::pinSCL, Cfg::pinSDA);
 PZEM004Tv30 pzem(Serial1, Cfg::pinRX, Cfg::pinTX);
+SemaphoreHandle_t semaPzem;
 AsyncWebServer server(80);
 AsyncWebSocket ws("/power/ws");
 AsyncMqttClient mqtt;
-CircularBuffer<ChartData, 720> chartBuffer;
-CircularBuffer<TempChartData, 60> tempChartBuffer;
+StaticJsonDocument<2048> webDoc;
+char webDataBuffer[4096];
+SemaphoreHandle_t semaWebDataBuffer;
+CircularBuffer<ChartData, 720> historicalData;
+SemaphoreHandle_t semaHistoricalData;
+CircularBuffer<TempChartData, 60> tempData;
+NodeData currentData;
+Settings moduleSettings;
 
 bool ethConnected = false;
 bool timeSynchronized = false;
-Settings moduleSettings;
-NodeData data;
-char webDataBuffer[40960];
-StaticJsonDocument<2048> webDoc;
 
 void setup()
 {
@@ -61,7 +64,9 @@ void setup()
 
   eg = xEventGroupCreate();
   qMqtt = xQueueCreate(4, sizeof(MqttMessage));
-  sema_PZEM = xSemaphoreCreateMutex();
+  semaPzem = xSemaphoreCreateMutex();
+  semaHistoricalData = xSemaphoreCreateMutex();
+  semaWebDataBuffer = xSemaphoreCreateMutex();
 
   SPIFFS.begin(true);
   EEPROM.begin(sizeof(Settings));
@@ -79,12 +84,13 @@ void setup()
   xTaskCreatePinnedToCore(taskUpdateDisplay, "UpdateDisplay", TaskStack10K, NULL, Priority3, NULL, Core1);
   xTaskCreatePinnedToCore(taskUpdateWebClients, "UpdateWebClients", TaskStack10K, NULL, Priority3, NULL, Core1);
   xTaskCreatePinnedToCore(taskSendMqttMessages, "tMqtt", TaskStack10K, NULL, Priority2, NULL, Core1);
+  xTaskCreatePinnedToCore(taskChartCalcs, "tChartCalcs", TaskStack10K, NULL, Priority2, NULL, Core1);
   tRequestData = xTimerCreate("RequestData", pdMS_TO_TICKS(moduleSettings.requestDataInterval), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(requestData));
   tConectMqtt = xTimerCreate("ConectMqtt", pdMS_TO_TICKS(10000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
   tConectNetwork = xTimerCreate("ConectNetwork", pdMS_TO_TICKS(20000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(conectNetwork));
   tHandleTimeSync = xTimerCreate("HandleTimeSync", pdMS_TO_TICKS(10000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(handleTimeSync));
   tCleanupWebSockets = xTimerCreate("CleanupWebSockets", pdMS_TO_TICKS(1000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(cleanupWebSockets));
-  tHandleChartCalcs = xTimerCreate("HandleChartCalcs", pdMS_TO_TICKS(60000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(handleChartCalcs));
+  tHandleChartCalcs = xTimerCreate("HandleChartCalcs", pdMS_TO_TICKS(60000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(requestChartUpdate));
 
   initWebServer();
 
@@ -102,4 +108,9 @@ void loop()
 void requestData()
 {
   xEventGroupSetBits(eg, EVENT_RETRIEVE_DATA);
+}
+
+void requestChartUpdate()
+{
+  xEventGroupSetBits(eg, EVENT_UPDATE_CHART);
 }

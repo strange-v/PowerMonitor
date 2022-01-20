@@ -20,12 +20,11 @@ extern "C"
 #define EVENT_RETRIEVE_DATA (1 << 1)
 
 extern EventGroupHandle_t eg;
-extern SemaphoreHandle_t sema_PZEM;
+extern SemaphoreHandle_t semaPzem;
 extern PZEM004Tv30 pzem;
-extern NodeData data;
+extern NodeData currentData;
 extern Settings moduleSettings;
-extern CircularBuffer<ChartData, 720> chartBuffer;
-extern CircularBuffer<TempChartData, 60> tempChartBuffer;
+extern CircularBuffer<TempChartData, 60> tempData;
 
 void taskRetrieveData(void *pvParameters);
 bool resetEnergy();
