@@ -26,5 +26,6 @@ Settings _getDefaultSettings()
     Settings settings = {SIGNATURE, 0, 0, 0, 0, false};
     settings.requestDataInterval = 1000;
     strlcpy(settings.otaPassword, DEFAULT_OTA_PWD, sizeof(DEFAULT_OTA_PWD));
+    strlcpy(settings.ntpServer, DEFAULT_NTP_SERVER, sizeof(DEFAULT_NTP_SERVER));
     return settings;
 }

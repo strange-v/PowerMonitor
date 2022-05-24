@@ -29,7 +29,7 @@ struct MqttMessage
 };
 
 void configureMqtt();
-void connectToMqtt();
+void connectToMqttTimerHandler();
 void taskSendMqttMessages(void *pvParameters);
 void onMqttConnect(bool sessionPresent);
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason);

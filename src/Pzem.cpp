@@ -42,6 +42,40 @@ void taskRetrieveData(void *pvParameters)
     }
 }
 
+void taskResetEnergy(void *pvParameters)
+{
+    for (;;)
+    {
+        xEventGroupWaitBits(eg, EVENT_RESET_ENERGY, pdTRUE, pdTRUE, portMAX_DELAY);
+
+        if (!timeSynchronized)
+            continue;
+
+        time_t now;
+        tm local;
+
+        time(&now);
+        localtime_r(&now, &local);
+
+        uint32_t exprectedDate = static_cast<uint16_t>(local.tm_year);
+        exprectedDate = exprectedDate << 8 | static_cast<uint8_t>(local.tm_mon);
+        
+        if (moduleSettings.lastEnergyReset != exprectedDate)
+        {
+            resetEnergy();
+            moduleSettings.lastEnergyReset = exprectedDate;
+            saveSettings(moduleSettings);
+        }
+
+        xTimerChangePeriod(tResetEnergy, pdMS_TO_TICKS(5 * 60 * 1000), portMAX_DELAY);
+    }
+}
+
+void resetEnergyTimerHandler()
+{
+    xEventGroupSetBits(eg, EVENT_RESET_ENERGY);
+}
+
 bool resetEnergy()
 {
     bool result = false;

@@ -27,15 +27,15 @@ extern "C"
 #include <Settings.h>
 #include <Cfg.h>
 
-void requestData();
-void requestChartUpdate();
+void requestDataTimerHandler();
+void requestChartUpdateTimerHandler();
 
 EventGroupHandle_t eg;
 QueueHandle_t qMqtt;
 TimerHandle_t tRequestData;
 TimerHandle_t tConectMqtt;
 TimerHandle_t tConectNetwork;
-TimerHandle_t tHandleTimeSync;
+TimerHandle_t tResetEnergy;
 TimerHandle_t tCleanupWebSockets;
 TimerHandle_t tHandleChartCalcs;
 
@@ -86,18 +86,22 @@ void setup()
   xTaskCreatePinnedToCore(taskUpdateWebClients, "uwc", TaskStack15K, NULL, Priority3, NULL, Core1);
   xTaskCreatePinnedToCore(taskSendMqttMessages, "tMqtt", TaskStack10K, NULL, Priority2, NULL, Core1);
   xTaskCreatePinnedToCore(taskChartCalcs, "cc", TaskStack10K, NULL, Priority2, NULL, Core1);
-  tRequestData = xTimerCreate("rd", pdMS_TO_TICKS(moduleSettings.requestDataInterval), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(requestData));
-  tConectMqtt = xTimerCreate("cm", pdMS_TO_TICKS(10000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
-  tConectNetwork = xTimerCreate("cn", pdMS_TO_TICKS(20000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(conectNetwork));
-  tHandleTimeSync = xTimerCreate("hts", pdMS_TO_TICKS(10000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(handleTimeSync));
-  tCleanupWebSockets = xTimerCreate("cw", pdMS_TO_TICKS(1000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(cleanupWebSockets));
-  tHandleChartCalcs = xTimerCreate("hcc", pdMS_TO_TICKS(60000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(requestChartUpdate));
+  xTaskCreatePinnedToCore(taskResetEnergy, "re", TaskStack10K, NULL, Priority2, NULL, Core1);
+  
+  tRequestData = xTimerCreate("rd", pdMS_TO_TICKS(moduleSettings.requestDataInterval), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(requestDataTimerHandler));
+  tConectMqtt = xTimerCreate("cm", pdMS_TO_TICKS(10000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqttTimerHandler));
+  tConectNetwork = xTimerCreate("cn", pdMS_TO_TICKS(20000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(conectNetworkTimerHandler));
+  tResetEnergy = xTimerCreate("re", pdMS_TO_TICKS(60000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(resetEnergyTimerHandler));
+  tCleanupWebSockets = xTimerCreate("cw", pdMS_TO_TICKS(1000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(cleanupWebSocketsTimerHandler));
+  tHandleChartCalcs = xTimerCreate("hcc", pdMS_TO_TICKS(60000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(requestChartUpdateTimerHandler));
 
   initWebServer();
 
   xTimerStart(tRequestData, 0);
   xTimerStart(tConectNetwork, 0);
   xTimerStart(tCleanupWebSockets, 0);
+  xTimerStart(tResetEnergy, 0);
+  xTimerStart(tHandleChartCalcs, 0);
 }
 
 void loop()
@@ -106,12 +110,15 @@ void loop()
     ArduinoOTA.handle();
 }
 
-void requestData()
+void requestDataTimerHandler()
 {
   xEventGroupSetBits(eg, EVENT_RETRIEVE_DATA);
 }
 
-void requestChartUpdate()
+void requestChartUpdateTimerHandler()
 {
+  if (!timeSynchronized)
+    return;
+  
   xEventGroupSetBits(eg, EVENT_UPDATE_CHART);
 }

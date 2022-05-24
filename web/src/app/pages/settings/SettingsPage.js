@@ -131,6 +131,7 @@ export default class SettingsPage extends BasePage {
             { id: 'mqttUser', prop: 'mqttUsr' },
             { id: 'mqttPassword', prop: 'mqttPwd' },
             { id: 'mqttTopic', prop: 'mqttTopic' },
+            { id: 'ntpServer', prop: 'ntp' },
             { id: 'requestDataInterval', prop: 'rdi' },
             { id: 'otaPassword', prop: 'otaPwd' },
         ];

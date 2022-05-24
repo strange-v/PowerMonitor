@@ -18,7 +18,7 @@ void WiFiEvent(WiFiEvent_t event)
     ethConnected = true;
     initOta();
     initTime();
-    connectToMqtt();
+    connectToMqttTimerHandler();
     break;
   case ARDUINO_EVENT_ETH_DISCONNECTED:
     debugPrint("ETH Disconnected");
@@ -33,7 +33,7 @@ void WiFiEvent(WiFiEvent_t event)
   }
 }
 
-void conectNetwork()
+void conectNetworkTimerHandler()
 {
   if (!ethConnected)
   {

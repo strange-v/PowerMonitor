@@ -42,7 +42,7 @@ extern Settings moduleSettings;
 void initWebServer();
 void taskUpdateWebClients(void *pvParameters);
 void taskChartCalcs(void *pvParameters);
-void cleanupWebSockets();
+void cleanupWebSocketsTimerHandler();
 void _onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
 void _getSettings(AsyncWebServerRequest *request);
 void _saveSettings(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);

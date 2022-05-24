@@ -97,7 +97,7 @@ void taskChartCalcs(void *pvParameters)
     }
 }
 
-void cleanupWebSockets()
+void cleanupWebSocketsTimerHandler()
 {
     ws.cleanupClients();
 }
@@ -139,6 +139,7 @@ void _getSettings(AsyncWebServerRequest *request)
     webDoc["mqttPwd"] = data.mqttPassword;
     webDoc["mqttTopic"] = data.mqttTopic;
 
+    webDoc["ntp"] = data.ntpServer;
     webDoc["rdi"] = data.requestDataInterval;
     webDoc["otaPwd"] = data.otaPassword;
 
@@ -190,6 +191,7 @@ void _saveSettings(AsyncWebServerRequest *request, uint8_t *data, size_t len, si
     strlcpy(sett.mqttPassword, webDoc["mqttPwd"].as<const char *>(), sizeof(sett.mqttPassword));
     strlcpy(sett.mqttTopic, webDoc["mqttTopic"].as<const char *>(), sizeof(sett.mqttTopic));
 
+    strlcpy(sett.ntpServer, webDoc["ntp"].as<const char *>(), sizeof(sett.ntpServer));
     sett.requestDataInterval = webDoc["rdi"];
     strlcpy(sett.otaPassword, webDoc["otaPwd"].as<const char *>(), sizeof(sett.otaPassword));
 
@@ -198,7 +200,13 @@ void _saveSettings(AsyncWebServerRequest *request, uint8_t *data, size_t len, si
     xSemaphoreGive(semaWebDataBuffer);
     request->send(200);
 
-    bool restartRequired = moduleSettings.enableMqtt != sett.enableMqtt || strcmp(moduleSettings.mqttHost, sett.mqttHost) != 0 || strcmp(moduleSettings.mqttUser, sett.mqttUser) != 0 || strcmp(moduleSettings.mqttPassword, sett.mqttPassword) != 0 || strcmp(moduleSettings.mqttTopic, sett.mqttTopic) != 0 || strcmp(moduleSettings.otaPassword, sett.otaPassword) != 0;
+    bool restartRequired = moduleSettings.enableMqtt != sett.enableMqtt
+        || strcmp(moduleSettings.mqttHost, sett.mqttHost) != 0
+        || strcmp(moduleSettings.mqttUser, sett.mqttUser) != 0
+        || strcmp(moduleSettings.mqttPassword, sett.mqttPassword) != 0
+        || strcmp(moduleSettings.ntpServer, sett.ntpServer) != 0
+        || strcmp(moduleSettings.mqttTopic, sett.mqttTopic) != 0
+        || strcmp(moduleSettings.otaPassword, sett.otaPassword) != 0;
 
     if (restartRequired)
     {

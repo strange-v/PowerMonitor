@@ -5,8 +5,9 @@
 #include <EEPROM.h>
 
 #define START_ADDR 0
-#define SIGNATURE 0x123456F0
+#define SIGNATURE 0x123455F0
 #define DEFAULT_PORT 1883
+#define DEFAULT_NTP_SERVER "pool.ntp.org"
 #define DEFAULT_OTA_PWD "123456"
 
 struct Settings
@@ -25,8 +26,10 @@ struct Settings
     char mqttPassword[32];
     char mqttTopic[32];
 
+    char ntpServer[32];
     uint16_t requestDataInterval;
     char otaPassword[32];
+    uint32_t lastEnergyReset;
 };
 
 Settings getSettings();

@@ -18,15 +18,22 @@ extern "C"
 #include <Cfg.h>
 
 #define EVENT_RETRIEVE_DATA (1 << 1)
+#define EVENT_RESET_ENERGY (1 << 2)
 
 extern EventGroupHandle_t eg;
 extern SemaphoreHandle_t semaPzem;
 extern PZEM004Tv30 pzem;
+extern TimerHandle_t tResetEnergy;
+
+extern bool timeSynchronized;
 extern NodeData currentData;
 extern Settings moduleSettings;
 extern CircularBuffer<TempChartData, 60> tempData;
 
 void taskRetrieveData(void *pvParameters);
+void taskResetEnergy(void *pvParameters);
+void resetEnergyTimerHandler();
+
 bool resetEnergy();
 
 #endif

@@ -17,7 +17,7 @@ extern bool ethConnected;
 extern Settings moduleSettings;
 
 void WiFiEvent(WiFiEvent_t event);
-void conectNetwork();
+void conectNetworkTimerHandler();
 void initOta();
 
 #endif

@@ -12,7 +12,7 @@ void configureMqtt()
     mqtt.setCredentials(moduleSettings.mqttUser, moduleSettings.mqttPassword);
 }
 
-void connectToMqtt()
+void connectToMqttTimerHandler()
 {
     if (!moduleSettings.enableMqtt)
         return;
