@@ -103,13 +103,13 @@ export default class LiveDataPage extends BasePage {
         this._menu = new Menu({
             el: document.getElementById('btn-menu'),
             items: [{
-                text: 'Reset Energy',
-                iconCls: 'reset',
-                handler: this._onResetEnergyClick
-            }, {
                 text: 'Settings',
                 iconCls: 'settings',
                 handler: this._onSettingsClick
+            }, {
+                text: 'Reset Energy',
+                iconCls: 'reset',
+                handler: this._onResetEnergyClick
             }],
             scope: this
         });

@@ -15,6 +15,9 @@ void taskRetrieveData(void *pvParameters)
             currentData.frequency = pzem.frequency();
             currentData.pf = pzem.pf();
             currentData.uptime = millis() / 1000;
+            currentData.voltageWarn = 0;
+            currentData.powerWarn = 0;
+            currentData.currentWarn = 0;
 
             if (moduleSettings.voltageMin > 0 && moduleSettings.voltageMax > 0)
                 currentData.voltageWarn = currentData.voltage <= moduleSettings.voltageMin || currentData.voltage >= moduleSettings.voltageMax;

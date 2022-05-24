@@ -142,6 +142,7 @@ void _getSettings(AsyncWebServerRequest *request)
     webDoc["ntp"] = data.ntpServer;
     webDoc["rdi"] = data.requestDataInterval;
     webDoc["otaPwd"] = data.otaPassword;
+    webDoc["eRst"] = data.lastEnergyReset;
 
     if (xSemaphoreTake(semaWebDataBuffer, TICKS_TO_WAIT0) == pdTRUE)
     {
@@ -179,6 +180,8 @@ void _saveSettings(AsyncWebServerRequest *request, uint8_t *data, size_t len, si
     deserializeJson(webDoc, webDataBuffer, total);
 
     Settings sett;
+    sett.lastEnergyReset = moduleSettings.lastEnergyReset;
+
     sett.voltageMin = webDoc["vMin"];
     sett.voltageMax = webDoc["vMax"];
     sett.powerMax = webDoc["pMax"];
