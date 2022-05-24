@@ -61,6 +61,7 @@ void setup()
 {
   Serial.begin(115200);
   Serial.println("Starting...");
+  debugPrint("DEBUG MODE ON");
 
   eg = xEventGroupCreate();
   qMqtt = xQueueCreate(4, sizeof(MqttMessage));
@@ -80,17 +81,17 @@ void setup()
   WiFi.onEvent(WiFiEvent);
   ETH.begin();
 
-  xTaskCreatePinnedToCore(taskRetrieveData, "RetrieveData", TaskStack10K, NULL, Priority3, NULL, Core1);
-  xTaskCreatePinnedToCore(taskUpdateDisplay, "UpdateDisplay", TaskStack10K, NULL, Priority3, NULL, Core1);
-  xTaskCreatePinnedToCore(taskUpdateWebClients, "UpdateWebClients", TaskStack10K, NULL, Priority3, NULL, Core1);
+  xTaskCreatePinnedToCore(taskRetrieveData, "rd", TaskStack10K, NULL, Priority3, NULL, Core1);
+  xTaskCreatePinnedToCore(taskUpdateDisplay, "ud", TaskStack10K, NULL, Priority3, NULL, Core1);
+  xTaskCreatePinnedToCore(taskUpdateWebClients, "uwc", TaskStack15K, NULL, Priority3, NULL, Core1);
   xTaskCreatePinnedToCore(taskSendMqttMessages, "tMqtt", TaskStack10K, NULL, Priority2, NULL, Core1);
-  xTaskCreatePinnedToCore(taskChartCalcs, "tChartCalcs", TaskStack10K, NULL, Priority2, NULL, Core1);
-  tRequestData = xTimerCreate("RequestData", pdMS_TO_TICKS(moduleSettings.requestDataInterval), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(requestData));
-  tConectMqtt = xTimerCreate("ConectMqtt", pdMS_TO_TICKS(10000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
-  tConectNetwork = xTimerCreate("ConectNetwork", pdMS_TO_TICKS(20000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(conectNetwork));
-  tHandleTimeSync = xTimerCreate("HandleTimeSync", pdMS_TO_TICKS(10000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(handleTimeSync));
-  tCleanupWebSockets = xTimerCreate("CleanupWebSockets", pdMS_TO_TICKS(1000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(cleanupWebSockets));
-  tHandleChartCalcs = xTimerCreate("HandleChartCalcs", pdMS_TO_TICKS(60000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(requestChartUpdate));
+  xTaskCreatePinnedToCore(taskChartCalcs, "cc", TaskStack10K, NULL, Priority2, NULL, Core1);
+  tRequestData = xTimerCreate("rd", pdMS_TO_TICKS(moduleSettings.requestDataInterval), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(requestData));
+  tConectMqtt = xTimerCreate("cm", pdMS_TO_TICKS(10000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqtt));
+  tConectNetwork = xTimerCreate("cn", pdMS_TO_TICKS(20000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(conectNetwork));
+  tHandleTimeSync = xTimerCreate("hts", pdMS_TO_TICKS(10000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(handleTimeSync));
+  tCleanupWebSockets = xTimerCreate("cw", pdMS_TO_TICKS(1000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(cleanupWebSockets));
+  tHandleChartCalcs = xTimerCreate("hcc", pdMS_TO_TICKS(60000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(requestChartUpdate));
 
   initWebServer();
 

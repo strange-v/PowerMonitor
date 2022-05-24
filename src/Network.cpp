@@ -4,14 +4,14 @@ void WiFiEvent(WiFiEvent_t event)
 {
   switch (event)
   {
-  case SYSTEM_EVENT_ETH_START:
+  case ARDUINO_EVENT_ETH_START:
     debugPrint("ETH Started");
     ETH.setHostname("ESP32-PM1");
     break;
-  case SYSTEM_EVENT_ETH_CONNECTED:
+  case ARDUINO_EVENT_ETH_CONNECTED:
     debugPrint("ETH Connected");
     break;
-  case SYSTEM_EVENT_ETH_GOT_IP:
+  case ARDUINO_EVENT_ETH_GOT_IP:
     debugPrint("IP: ");
     debugPrint(ETH.localIP());
 
@@ -20,11 +20,11 @@ void WiFiEvent(WiFiEvent_t event)
     initTime();
     connectToMqtt();
     break;
-  case SYSTEM_EVENT_ETH_DISCONNECTED:
+  case ARDUINO_EVENT_ETH_DISCONNECTED:
     debugPrint("ETH Disconnected");
     ethConnected = false;
     break;
-  case SYSTEM_EVENT_ETH_STOP:
+  case ARDUINO_EVENT_ETH_STOP:
     debugPrint("ETH Stopped");
     ethConnected = false;
     break;

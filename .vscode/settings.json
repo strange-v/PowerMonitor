@@ -19,6 +19,13 @@
         "istream": "cpp",
         "limits": "cpp",
         "ostream": "cpp",
-        "streambuf": "cpp"
+        "streambuf": "cpp",
+        "fstream": "cpp",
+        "iosfwd": "cpp",
+        "new": "cpp",
+        "system_error": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "typeinfo": "cpp"
     }
 }
