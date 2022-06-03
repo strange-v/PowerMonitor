@@ -67,6 +67,7 @@ export default class LiveDataPage extends BasePage {
             frequency = document.getElementById('frequency'),
             pf = document.getElementById('pf'),
             energy = document.getElementById('energy'),
+            prevEnergy = document.getElementById('prevEnergy'),
             uptime = document.getElementById('uptime');
 
         power.innerText = Formatter.power(data.p);
@@ -75,6 +76,7 @@ export default class LiveDataPage extends BasePage {
         frequency.innerText = Formatter.frequency(data.f);
         pf.innerText = Formatter.powerFactor(data.pf);
         energy.innerText = Formatter.energy(data.e);
+        prevEnergy.innerText = Formatter.energy(data.pe);
         uptime.innerText = Formatter.uptime(data.u);
 
         if (data.pw)

@@ -40,6 +40,7 @@ void taskUpdateWebClients(void *pvParameters)
         doc["cw"] = currentData.currentWarn;
         doc["pf"] = round2(currentData.pf);
         doc["e"] = round2(currentData.energy);
+        doc["pe"] = round2(moduleSettings.prevEnergy);
         doc["u"] = currentData.uptime;
 
         serializeJson(doc, buffer);
@@ -181,6 +182,7 @@ void _saveSettings(AsyncWebServerRequest *request, uint8_t *data, size_t len, si
 
     Settings sett;
     sett.lastEnergyReset = moduleSettings.lastEnergyReset;
+    sett.prevEnergy = moduleSettings.prevEnergy;
 
     sett.voltageMin = webDoc["vMin"];
     sett.voltageMax = webDoc["vMax"];

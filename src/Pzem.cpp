@@ -65,8 +65,9 @@ void taskResetEnergy(void *pvParameters)
         
         if (moduleSettings.lastEnergyReset != exprectedDate)
         {
-            resetEnergy();
             moduleSettings.lastEnergyReset = exprectedDate;
+            moduleSettings.prevEnergy = currentData.energy;
+            resetEnergy();
             saveSettings(moduleSettings);
         }
 

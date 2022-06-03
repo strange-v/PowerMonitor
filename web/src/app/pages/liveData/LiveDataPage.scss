@@ -9,7 +9,7 @@
             height: 120px;
             background-color: #1d1d1d;
             margin-bottom: 12px;
-            padding: 16px;
+            padding: 16px 16px 12px 16px;
             box-sizing: border-box;
             border-radius: 5px;
         
@@ -29,9 +29,13 @@
                 opacity: 38%;
                 margin-bottom: 18px;
             }
-        
             .value {
                 font-size: 1.8em;
+            }
+            .footer {
+                margin-top: 4px;
+                opacity: 38%;
+                text-align: right;
             }
         }
 

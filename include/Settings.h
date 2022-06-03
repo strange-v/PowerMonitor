@@ -30,6 +30,7 @@ struct Settings
     uint16_t requestDataInterval;
     char otaPassword[32];
     uint32_t lastEnergyReset;
+    float prevEnergy;
 };
 
 Settings getSettings();
