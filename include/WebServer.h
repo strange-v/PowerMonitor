@@ -48,6 +48,7 @@ void _getSettings(AsyncWebServerRequest *request);
 void _saveSettings(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);
 void _resetEnergy(AsyncWebServerRequest *request);
 void _getChartData(AsyncWebServerRequest *request);
+void _reboot(AsyncWebServerRequest *request);
 void _getDebug(AsyncWebServerRequest *request);
 void _notFound(AsyncWebServerRequest *request);
 float _getMinValueByType(AsyncWebParameter* param, ChartData data);

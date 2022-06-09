@@ -38,6 +38,14 @@ export default class LiveDataPage extends BasePage {
         this.redirectTo('/settings');
     }
 
+    _onRebootClick(e) {
+        e.stopPropagation();
+
+        fetch('/power/api/reboot')
+            .then(() => location.reload())
+            .catch(e => console.log(e));
+    }
+
     _resetEnergy() {
         this._ws.suppressEvents(true);
         this.showLoading();
@@ -112,6 +120,10 @@ export default class LiveDataPage extends BasePage {
                 text: 'Reset Energy',
                 iconCls: 'reset',
                 handler: this._onResetEnergyClick
+            }, {
+                text: 'Reboot',
+                iconCls: 'reboot',
+                handler: this._onRebootClick
             }],
             scope: this
         });

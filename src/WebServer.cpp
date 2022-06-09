@@ -10,6 +10,7 @@ void initWebServer()
     server.on("/power/api/settings", HTTP_PUT, [](AsyncWebServerRequest *request) {}, NULL, _saveSettings);
     server.on("/power/api/resetEnergy", HTTP_POST, _resetEnergy);
     server.on("/power/api/chart", HTTP_GET, _getChartData);
+    server.on("/power/api/reboot", HTTP_GET, _reboot);
     server.on("/power/api/debug", HTTP_GET, _getDebug);
 
     server.serveStatic("/power/", SPIFFS, "/");
@@ -85,10 +86,10 @@ void taskChartCalcs(void *pvParameters)
         }
         tempData.clear();
 
-        cd.minVoltage = minVoltage;
-        cd.maxVoltage = maxVoltage;
-        cd.minPower = minPower;
-        cd.maxPower = maxPower;
+        cd.minVoltage = isnan(minVoltage) ? 0 : minVoltage;
+        cd.maxVoltage = isnan(maxVoltage) ? 0 : maxVoltage;
+        cd.minPower = isnan(minPower) ? 0 : minPower;
+        cd.maxPower = isnan(maxPower) ? 0 : maxPower;
         
         if (xSemaphoreTake(semaHistoricalData, pdMS_TO_TICKS(10000)) == pdTRUE)
         {
@@ -319,6 +320,12 @@ void _getChartData(AsyncWebServerRequest *request)
     }
 }
 
+void _reboot(AsyncWebServerRequest *request)
+{
+    request->send(200, CONTENT_TYPE_TEXT, "OK");
+    ESP.restart();
+}
+
 void _getDebug(AsyncWebServerRequest *request)
 {
     time_t now;
@@ -335,7 +342,10 @@ void _getDebug(AsyncWebServerRequest *request)
 
     if (xSemaphoreTake(semaWebDataBuffer, TICKS_TO_WAIT0) == pdTRUE)
     {
-        sprintf(webDataBuffer, "HEAP: %d, NOW: %02d.%02d.%d %02d:%02d:%02d\n", ESP.getFreeHeap(), day, month, year, hour, minute, second);
+        sprintf(webDataBuffer, "HEAP: %d, HIST DATA SIZE: %d, NOW: %02d.%02d.%d %02d:%02d:%02d\n",
+            ESP.getFreeHeap(),
+            historicalData.size(),
+            day, month, year, hour, minute, second);
         request->send(200, CONTENT_TYPE_TEXT, webDataBuffer);
         
         xSemaphoreGive(semaWebDataBuffer);

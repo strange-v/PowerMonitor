@@ -29,11 +29,18 @@ body {
     .title {
         margin-right: auto;
     }
+
     >.button {
         >.icon {
             margin-top: 8px;
         }
+
+        &.btn-back {
+            margin-left: -16px;
+            margin-right: 8px;
+        }
     }
+
     .button {
         position: relative;
 
@@ -44,35 +51,45 @@ body {
             cursor: pointer;
 
             &.back {
-                margin-left: -16px;
-                margin-right: 8px;
                 background: url("images/back.svg") center center no-repeat;
                 background-size: 24px 24px;
             }
+
             &.settings {
                 background: url("images/settings.svg") center center no-repeat;
                 background-size: 24px 24px;
             }
+
             &.reset {
                 background: url("images/reset.svg") center center no-repeat;
                 background-size: 24px 24px;
             }
+
             &.save {
                 background: url("images/save.svg") center center no-repeat;
                 background-size: 24px 24px;
             }
+
             &.menu {
                 background: url("images/menu.svg") center center no-repeat;
                 background-size: 24px 24px;
             }
+
             &.reload {
                 background: url("images/reload.svg") center center no-repeat;
                 background-size: 24px 24px;
             }
+
+            &.reboot {
+                background: url("images/reboot.svg") center center no-repeat;
+                background-size: 24px 24px;
+            }
         }
+
         .text {
             vertical-align: top;
         }
+
         ul.menu {
             right: 0;
             top: 40px;
@@ -113,6 +130,7 @@ form {
     .sub-header {
         padding: 8px 0;
     }
+
     .field {
         position: relative;
         margin-bottom: 8px;
@@ -121,6 +139,7 @@ form {
             opacity: 0.6;
             pointer-events: none;
         }
+
         &.checkbox {
             display: flex;
 
@@ -128,15 +147,18 @@ form {
                 margin-right: 16px;
                 margin-top: 8px;
             }
+
             label {
                 margin-right: auto;
             }
         }
+
         label {
             display: inline-block;
             padding: 4px 0px;
             color: #bdbdbd;
         }
+
         input:not([type="checkbox"]) {
             width: 100%;
             font-size: 1em;
@@ -146,10 +168,12 @@ form {
             color: #fff;
             box-sizing: border-box;
         }
+
         input[type="checkbox"] {
             transform: scale(2);
             padding: 10px;
         }
+
         .value {
             position: absolute;
             top: 4px;

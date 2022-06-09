@@ -8,13 +8,25 @@ void taskRetrieveData(void *pvParameters)
 
         if (xSemaphoreTake(semaPzem, TICKS_TO_WAIT12) == pdTRUE)
         {
-            currentData.voltage = pzem.voltage();
+            uint32_t uptime = millis() / 1000;
+            float voltage = pzem.voltage();
+            if (isnan(voltage))
+            {
+                xSemaphoreGive(semaPzem);
+                currentData = {0, false, 0, 0, false, 0, false, 0, 0, uptime};
+                return;
+            }
+
+            currentData.voltage = voltage;
             currentData.current = pzem.current();
             currentData.power = pzem.power();
             currentData.energy = pzem.energy();
             currentData.frequency = pzem.frequency();
             currentData.pf = pzem.pf();
-            currentData.uptime = millis() / 1000;
+
+            xSemaphoreGive(semaPzem);
+
+            currentData.uptime = uptime;
             currentData.voltageWarn = 0;
             currentData.powerWarn = 0;
             currentData.currentWarn = 0;
@@ -26,8 +38,7 @@ void taskRetrieveData(void *pvParameters)
             if (moduleSettings.currentMax > 0)
                 currentData.currentWarn = currentData.current >= moduleSettings.currentMax;
 
-            xSemaphoreGive(semaPzem);
-
+            tempData.push({currentData.voltage, currentData.power});
             xEventGroupSetBits(eg, EVENT_UPDATE_DISPLAY | EVENT_UPDATE_WEB_CLIENTS);
 
             // ToDo: Probably move to a separate task
@@ -39,8 +50,6 @@ void taskRetrieveData(void *pvParameters)
                     debugPrint("Failed to add to the mqtt queue");
                 }
             }
-
-            tempData.push({currentData.voltage, currentData.power});
         }
     }
 }
