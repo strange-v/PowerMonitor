@@ -10,7 +10,6 @@ extern "C"
 #include <PZEM004Tv30.h>
 #include <CircularBuffer.h>
 #include <NodeData.h>
-#include <ChartData.h>
 #include <Display.h>
 #include <WebServer.h>
 #include <Mqtt.h>
@@ -28,12 +27,10 @@ extern TimerHandle_t tResetEnergy;
 extern bool timeSynchronized;
 extern NodeData currentData;
 extern Settings moduleSettings;
-extern CircularBuffer<TempChartData, 60> tempData;
 
 void taskRetrieveData(void *pvParameters);
 void taskResetEnergy(void *pvParameters);
 void resetEnergyTimerHandler();
-
 bool resetEnergy();
 
 #endif

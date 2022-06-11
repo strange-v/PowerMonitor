@@ -16,7 +16,6 @@ extern "C"
 #include <Module.h>
 #include <Pzem.h>
 #include <NodeData.h>
-#include <ChartData.h>
 
 #define CONTENT_TYPE_TEXT "text/plain"
 #define CONTENT_TYPE_HTML "text/html"
@@ -24,15 +23,11 @@ extern "C"
 #define CONTENT_TYPE_JS "text/javascript"
 #define CONTENT_TYPE_JSON "application/json"
 #define EVENT_UPDATE_WEB_CLIENTS (1 << 20)
-#define EVENT_UPDATE_CHART (1 << 21)
 
 extern AsyncWebServer server;
 extern AsyncWebSocket ws;
 extern EventGroupHandle_t eg;
 
-extern CircularBuffer<ChartData, 720> historicalData;
-extern SemaphoreHandle_t semaHistoricalData;
-extern CircularBuffer<TempChartData, 60> tempData;
 extern StaticJsonDocument<2048> webDoc;
 extern char webDataBuffer[4096];
 extern SemaphoreHandle_t semaWebDataBuffer;
@@ -41,17 +36,13 @@ extern Settings moduleSettings;
 
 void initWebServer();
 void taskUpdateWebClients(void *pvParameters);
-void taskChartCalcs(void *pvParameters);
 void cleanupWebSocketsTimerHandler();
 void _onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len);
 void _getSettings(AsyncWebServerRequest *request);
 void _saveSettings(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);
 void _resetEnergy(AsyncWebServerRequest *request);
-void _getChartData(AsyncWebServerRequest *request);
 void _reboot(AsyncWebServerRequest *request);
 void _getDebug(AsyncWebServerRequest *request);
 void _notFound(AsyncWebServerRequest *request);
-float _getMinValueByType(AsyncWebParameter* param, ChartData data);
-float _getMaxValueByType(AsyncWebParameter* param, ChartData data);
 
 #endif

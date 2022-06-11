@@ -128,7 +128,7 @@ export default class LiveDataPage extends BasePage {
             scope: this
         });
 
-        this.addListener('power-card', 'click', () => this._openChart(POWER));
-        this.addListener('voltage-card', 'click', () => this._openChart(VOLTAGE));
+        // this.addListener('power-card', 'click', () => this._openChart(POWER));
+        // this.addListener('voltage-card', 'click', () => this._openChart(VOLTAGE));
     }
 }

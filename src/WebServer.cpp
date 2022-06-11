@@ -9,7 +9,6 @@ void initWebServer()
     server.on("/power/api/settings", HTTP_GET, _getSettings);
     server.on("/power/api/settings", HTTP_PUT, [](AsyncWebServerRequest *request) {}, NULL, _saveSettings);
     server.on("/power/api/resetEnergy", HTTP_POST, _resetEnergy);
-    server.on("/power/api/chart", HTTP_GET, _getChartData);
     server.on("/power/api/reboot", HTTP_GET, _reboot);
     server.on("/power/api/debug", HTTP_GET, _getDebug);
 
@@ -47,55 +46,6 @@ void taskUpdateWebClients(void *pvParameters)
         serializeJson(doc, buffer);
 
         ws.textAll(buffer);
-    }
-}
-
-void taskChartCalcs(void *pvParameters)
-{
-    time_t now;
-    tm local;
-    ChartData cd;
-
-    for (;;)
-    {
-        xEventGroupWaitBits(eg, EVENT_UPDATE_CHART, pdTRUE, pdTRUE, portMAX_DELAY);
-
-        time(&now);
-        localtime_r(&now, &local);
-
-        // ToDo: Optimize this
-        cd.date = static_cast<uint8_t>(local.tm_mday);
-        cd.date = cd.date << 8 | static_cast<uint8_t>(local.tm_hour);
-        cd.date = cd.date << 8 | static_cast<uint8_t>(local.tm_min);
-
-        float maxVoltage = tempData[0].voltage;
-        float minVoltage = tempData[0].voltage;
-        float maxPower = tempData[0].power;
-        float minPower = tempData[0].power;
-        for (decltype(tempData)::index_t i = 0; i < tempData.size(); i++)
-        {
-            if (maxVoltage < tempData[i].voltage)
-                maxVoltage = tempData[i].voltage;
-            if (minVoltage > tempData[i].voltage)
-                minVoltage = tempData[i].voltage;
-            
-            if (maxPower < tempData[i].power)
-                maxPower = tempData[i].power;
-            if (minPower > tempData[i].power)
-                minPower = tempData[i].power;
-        }
-        tempData.clear();
-
-        cd.minVoltage = isnan(minVoltage) ? 0 : minVoltage;
-        cd.maxVoltage = isnan(maxVoltage) ? 0 : maxVoltage;
-        cd.minPower = isnan(minPower) ? 0 : minPower;
-        cd.maxPower = isnan(maxPower) ? 0 : maxPower;
-        
-        if (xSemaphoreTake(semaHistoricalData, pdMS_TO_TICKS(10000)) == pdTRUE)
-        {
-            historicalData.push(cd);
-            xSemaphoreGive(semaHistoricalData);
-        }
     }
 }
 
@@ -230,96 +180,6 @@ void _resetEnergy(AsyncWebServerRequest *request)
     request->send(200);
 }
 
-void _getChartData(AsyncWebServerRequest *request)
-{
-    if(!request->hasParam("type"))
-    {
-        request->send(500, CONTENT_TYPE_TEXT, "No type");
-        return;
-    }
-
-    bool needRetry = false;
-    AsyncWebParameter* type = request->getParam("type");
-    if (xSemaphoreTake(semaHistoricalData, TICKS_TO_WAIT0) == pdTRUE)
-    {
-        if (xSemaphoreTake(semaWebDataBuffer, TICKS_TO_WAIT0) == pdTRUE)
-        {
-            AsyncWebServerResponse *response = request->beginChunkedResponse(CONTENT_TYPE_JSON, [type](uint8_t *buffer, size_t maxLen, size_t index) -> size_t
-            {
-                char lineBuffer[64];
-                size_t max = (maxLen > sizeof(webDataBuffer) ? sizeof(webDataBuffer) : maxLen) - 4;
-                size_t copied = 0;
-                size_t skipped = 0;
-                size_t lineLen = 0;
-
-                webDataBuffer[0] = '\0';
-                if (index == 0)
-                {
-                    strcpy(webDataBuffer, "[");
-                    copied++;
-                }
-                else
-                    skipped++;
-
-                for (decltype(historicalData)::index_t i = 0; i < historicalData.size(); i++)
-                {
-                    ChartData data = historicalData[i];
-                    lineLen = sprintf(lineBuffer, "[%u,%.2f,%.2f],", data.date, _getMinValueByType(type, data), _getMaxValueByType(type, data));
-
-                    if (index > 0 && skipped + lineLen <= index)
-                    {
-                        skipped += lineLen;
-                        continue;
-                    }
-
-                    if (copied + lineLen > max)
-                    {
-                        memcpy(buffer, webDataBuffer, copied);
-                        return copied;
-                    }
-
-                    strcat(webDataBuffer, lineBuffer);
-                    copied += lineLen;
-                }
-
-                if (copied == 0 && index > 0)
-                {
-                    xSemaphoreGive(semaWebDataBuffer);
-                    xSemaphoreGive(semaHistoricalData);
-                    return 0;
-                }
-
-                if (strlen(webDataBuffer) > 1)
-                    webDataBuffer[strlen(webDataBuffer) - 1] = '\0';
-                else
-                    copied++;
-
-                strcat(webDataBuffer, "]");
-
-                memcpy(buffer, webDataBuffer, copied);
-                return copied;
-            });
-            request->send(response);
-        }
-        else
-        {
-            xSemaphoreGive(semaHistoricalData);
-            needRetry = true;
-        }
-    }
-    else
-    {
-        needRetry = true;
-    }
-
-    if (needRetry)
-    {
-        char buffer[64];
-        sprintf(buffer, "%s?type=%s", request->url().c_str(), type->value().c_str());
-        request->redirect(buffer);
-    }
-}
-
 void _reboot(AsyncWebServerRequest *request)
 {
     request->send(200, CONTENT_TYPE_TEXT, "OK");
@@ -342,9 +202,8 @@ void _getDebug(AsyncWebServerRequest *request)
 
     if (xSemaphoreTake(semaWebDataBuffer, TICKS_TO_WAIT0) == pdTRUE)
     {
-        sprintf(webDataBuffer, "HEAP: %d, HIST DATA SIZE: %d, NOW: %02d.%02d.%d %02d:%02d:%02d\n",
+        sprintf(webDataBuffer, "HEAP: %d, NOW: %02d.%02d.%d %02d:%02d:%02d\n",
             ESP.getFreeHeap(),
-            historicalData.size(),
             day, month, year, hour, minute, second);
         request->send(200, CONTENT_TYPE_TEXT, webDataBuffer);
         
@@ -359,14 +218,4 @@ void _getDebug(AsyncWebServerRequest *request)
 void _notFound(AsyncWebServerRequest *request)
 {
     request->send(404, CONTENT_TYPE_TEXT, "Not found");
-}
-
-float _getMinValueByType(AsyncWebParameter* param, ChartData data)
-{
-    return strcmp(param->value().c_str(), "1") == 0 ? data.minPower : data.minVoltage;
-}
-
-float _getMaxValueByType(AsyncWebParameter* param, ChartData data)
-{
-    return strcmp(param->value().c_str(), "1") == 0 ? data.maxPower : data.maxVoltage;
 }

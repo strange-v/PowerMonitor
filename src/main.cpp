@@ -16,7 +16,6 @@ extern "C"
 #include <AsyncMqttClient.h>
 #include <CircularBuffer.h>
 #include <NodeData.h>
-#include <ChartData.h>
 #include <Network.h>
 #include <Pzem.h>
 #include <WebServer.h>
@@ -28,7 +27,6 @@ extern "C"
 #include <Cfg.h>
 
 void requestDataTimerHandler();
-void requestChartUpdateTimerHandler();
 
 EventGroupHandle_t eg;
 QueueHandle_t qMqtt;
@@ -48,9 +46,6 @@ AsyncMqttClient mqtt;
 StaticJsonDocument<2048> webDoc;
 char webDataBuffer[4096];
 SemaphoreHandle_t semaWebDataBuffer;
-CircularBuffer<ChartData, 720> historicalData;
-SemaphoreHandle_t semaHistoricalData;
-CircularBuffer<TempChartData, 60> tempData;
 NodeData currentData;
 Settings moduleSettings;
 
@@ -66,7 +61,6 @@ void setup()
   eg = xEventGroupCreate();
   qMqtt = xQueueCreate(4, sizeof(MqttMessage));
   semaPzem = xSemaphoreCreateMutex();
-  semaHistoricalData = xSemaphoreCreateMutex();
   semaWebDataBuffer = xSemaphoreCreateMutex();
 
   SPIFFS.begin(true);
@@ -85,7 +79,6 @@ void setup()
   xTaskCreatePinnedToCore(taskUpdateDisplay, "ud", TaskStack10K, NULL, Priority3, NULL, Core1);
   xTaskCreatePinnedToCore(taskUpdateWebClients, "uwc", TaskStack15K, NULL, Priority3, NULL, Core1);
   xTaskCreatePinnedToCore(taskSendMqttMessages, "tMqtt", TaskStack10K, NULL, Priority2, NULL, Core1);
-  xTaskCreatePinnedToCore(taskChartCalcs, "cc", TaskStack10K, NULL, Priority2, NULL, Core1);
   xTaskCreatePinnedToCore(taskResetEnergy, "re", TaskStack10K, NULL, Priority2, NULL, Core1);
   
   tRequestData = xTimerCreate("rd", pdMS_TO_TICKS(moduleSettings.requestDataInterval), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(requestDataTimerHandler));
@@ -93,7 +86,6 @@ void setup()
   tConectNetwork = xTimerCreate("cn", pdMS_TO_TICKS(20000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(conectNetworkTimerHandler));
   tResetEnergy = xTimerCreate("re", pdMS_TO_TICKS(60000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(resetEnergyTimerHandler));
   tCleanupWebSockets = xTimerCreate("cw", pdMS_TO_TICKS(1000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(cleanupWebSocketsTimerHandler));
-  tHandleChartCalcs = xTimerCreate("hcc", pdMS_TO_TICKS(60000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(requestChartUpdateTimerHandler));
 
   initWebServer();
 
@@ -101,7 +93,6 @@ void setup()
   xTimerStart(tConectNetwork, 0);
   xTimerStart(tCleanupWebSockets, 0);
   xTimerStart(tResetEnergy, 0);
-  xTimerStart(tHandleChartCalcs, 0);
 }
 
 void loop()
@@ -113,12 +104,4 @@ void loop()
 void requestDataTimerHandler()
 {
   xEventGroupSetBits(eg, EVENT_RETRIEVE_DATA);
-}
-
-void requestChartUpdateTimerHandler()
-{
-  if (!timeSynchronized)
-    return;
-  
-  xEventGroupSetBits(eg, EVENT_UPDATE_CHART);
 }

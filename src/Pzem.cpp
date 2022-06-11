@@ -38,7 +38,6 @@ void taskRetrieveData(void *pvParameters)
             if (moduleSettings.currentMax > 0)
                 currentData.currentWarn = currentData.current >= moduleSettings.currentMax;
 
-            tempData.push({currentData.voltage, currentData.power});
             xEventGroupSetBits(eg, EVENT_UPDATE_DISPLAY | EVENT_UPDATE_WEB_CLIENTS);
 
             // ToDo: Probably move to a separate task
