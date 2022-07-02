@@ -16,9 +16,8 @@ extern TimerHandle_t tResetEnergy;
 extern TimerHandle_t tHandleChartCalcs;
 extern Settings moduleSettings;
 extern bool ethConnected;
-extern bool timeSynchronized;
 
 void initTime();
-bool syncTime();
+bool isTimeSynchronized();
 
 #endif

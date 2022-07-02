@@ -50,7 +50,6 @@ NodeData currentData;
 Settings moduleSettings;
 
 bool ethConnected = false;
-bool timeSynchronized = false;
 
 void setup()
 {

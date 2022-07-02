@@ -13,6 +13,7 @@ extern "C"
 #include <Display.h>
 #include <WebServer.h>
 #include <Mqtt.h>
+#include <TimeSync.h>
 #include <Settings.h>
 #include <Cfg.h>
 
@@ -24,7 +25,6 @@ extern SemaphoreHandle_t semaPzem;
 extern PZEM004Tv30 pzem;
 extern TimerHandle_t tResetEnergy;
 
-extern bool timeSynchronized;
 extern NodeData currentData;
 extern Settings moduleSettings;
 

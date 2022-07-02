@@ -5,7 +5,6 @@ import Formatter from 'app//utils/Formatter';
 import WebSocketWrapper from 'app//utils/WebSocketWrapper';
 import Confirmation from 'app//components/confirmation/Confirmation';
 import Menu from 'app/components/menu/Menu';
-import { POWER, VOLTAGE } from '../chart/ChartType'
 
 export default class LiveDataPage extends BasePage {
     init() {
@@ -105,10 +104,6 @@ export default class LiveDataPage extends BasePage {
         this.showContent();
     }
 
-    _openChart(type) {
-        this.redirectTo(`/chart/${type}`);
-    }
-
     _initControls() {
         this._menu = new Menu({
             el: document.getElementById('btn-menu'),
@@ -127,8 +122,5 @@ export default class LiveDataPage extends BasePage {
             }],
             scope: this
         });
-
-        // this.addListener('power-card', 'click', () => this._openChart(POWER));
-        // this.addListener('voltage-card', 'click', () => this._openChart(VOLTAGE));
     }
 }

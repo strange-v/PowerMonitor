@@ -1,14 +1,12 @@
 import LiveDataPage from "app/pages/liveData/LiveDataPage";
 import SettingsPage from "app/pages/settings/SettingsPage";
-import ChartPage from "app/pages/chart/ChartPage";
 import Router from "app/Router";
 import "./main.scss";
 
 class App {
     routes = {
         '/': LiveDataPage,
-        '/settings': SettingsPage,
-        '/chart/{type:int}': ChartPage,
+        '/settings': SettingsPage
     };
 
     init() {

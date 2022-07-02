@@ -59,7 +59,7 @@ void taskResetEnergy(void *pvParameters)
     {
         xEventGroupWaitBits(eg, EVENT_RESET_ENERGY, pdTRUE, pdTRUE, portMAX_DELAY);
 
-        if (!timeSynchronized)
+        if (!isTimeSynchronized())
             continue;
 
         time_t now;

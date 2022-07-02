@@ -3,16 +3,16 @@
 void initTime()
 {
     configTime(0, 0, moduleSettings.ntpServer);
-    syncTime();
+    isTimeSynchronized();
 }
 
-bool syncTime()
+bool isTimeSynchronized()
 {
     time_t now;
     time(&now);
 
     tm local;
     localtime_r(&now, &local);
-    timeSynchronized = local.tm_year > (2016 - 1900);
-    return timeSynchronized;
+
+    return local.tm_year > (2016 - 1900);
 }
