@@ -17,6 +17,11 @@
 #define TICKS_TO_WAIT0 0
 #define TICKS_TO_WAIT12 12
 
+#ifdef TELNET_DEBUG
+#include <ESPTelnet.h>
+extern ESPTelnet telnet;
+#endif
+
 void debugPrint(const char* text);
 void debugPrintf(const char *format, ...);
 void debugPrint(const IPAddress ip);

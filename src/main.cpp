@@ -26,6 +26,11 @@ extern "C"
 #include <Settings.h>
 #include <Cfg.h>
 
+#ifdef TELNET_DEBUG
+#include <ESPTelnet.h>
+ESPTelnet telnet;
+#endif
+
 void requestDataTimerHandler();
 
 EventGroupHandle_t eg;
@@ -53,12 +58,14 @@ bool ethConnected = false;
 
 void setup()
 {
+#ifdef SERIAL_DEBUG
   Serial.begin(115200);
-  Serial.println("Starting...");
+  Serial.println(F("Starting..."));
+#endif
   debugPrint("DEBUG MODE ON");
 
   eg = xEventGroupCreate();
-  qMqtt = xQueueCreate(4, sizeof(MqttMessage));
+  qMqtt = xQueueCreate(10, sizeof(MqttMessage));
   semaPzem = xSemaphoreCreateMutex();
   semaWebDataBuffer = xSemaphoreCreateMutex();
 
@@ -69,7 +76,7 @@ void setup()
 
   u8g2.begin();
   u8g2.setContrast(Cfg::screenBrightness);
-  
+
   configureMqtt();
   WiFi.onEvent(WiFiEvent);
   ETH.begin();
@@ -79,7 +86,7 @@ void setup()
   xTaskCreatePinnedToCore(taskUpdateWebClients, "uwc", TaskStack15K, NULL, Priority3, NULL, Core1);
   xTaskCreatePinnedToCore(taskSendMqttMessages, "tMqtt", TaskStack10K, NULL, Priority2, NULL, Core1);
   xTaskCreatePinnedToCore(taskResetEnergy, "re", TaskStack10K, NULL, Priority2, NULL, Core1);
-  
+
   tRequestData = xTimerCreate("rd", pdMS_TO_TICKS(moduleSettings.requestDataInterval), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(requestDataTimerHandler));
   tConectMqtt = xTimerCreate("cm", pdMS_TO_TICKS(10000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(connectToMqttTimerHandler));
   tConectNetwork = xTimerCreate("cn", pdMS_TO_TICKS(20000), pdTRUE, (void *)0, reinterpret_cast<TimerCallbackFunction_t>(conectNetworkTimerHandler));
@@ -97,7 +104,12 @@ void setup()
 void loop()
 {
   if (ethConnected)
+  {
     ArduinoOTA.handle();
+#ifdef TELNET_DEBUG
+    telnet.loop();
+#endif
+  }
 }
 
 void requestDataTimerHandler()

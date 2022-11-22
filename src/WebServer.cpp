@@ -91,6 +91,10 @@ void _getSettings(AsyncWebServerRequest *request)
     webDoc["mqttPwd"] = data.mqttPassword;
     webDoc["mqttTopic"] = data.mqttTopic;
 
+    webDoc["ha"] = data.enableHomeAssistant;
+    webDoc["haPref"] = data.haDiscoveryPrefix;
+    webDoc["haNodeId"] = data.haNodeId;
+
     webDoc["ntp"] = data.ntpServer;
     webDoc["rdi"] = data.requestDataInterval;
     webDoc["otaPwd"] = data.otaPassword;
@@ -146,6 +150,10 @@ void _saveSettings(AsyncWebServerRequest *request, uint8_t *data, size_t len, si
     strlcpy(sett.mqttUser, webDoc["mqttUsr"].as<const char *>(), sizeof(sett.mqttUser));
     strlcpy(sett.mqttPassword, webDoc["mqttPwd"].as<const char *>(), sizeof(sett.mqttPassword));
     strlcpy(sett.mqttTopic, webDoc["mqttTopic"].as<const char *>(), sizeof(sett.mqttTopic));
+
+    sett.enableHomeAssistant = webDoc["ha"];
+    strlcpy(sett.haDiscoveryPrefix, webDoc["haPref"].as<const char *>(), sizeof(sett.haDiscoveryPrefix));
+    strlcpy(sett.haNodeId, webDoc["haNodeId"].as<const char *>(), sizeof(sett.haNodeId));
 
     strlcpy(sett.ntpServer, webDoc["ntp"].as<const char *>(), sizeof(sett.ntpServer));
     sett.requestDataInterval = webDoc["rdi"];

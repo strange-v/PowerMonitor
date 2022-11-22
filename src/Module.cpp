@@ -2,8 +2,11 @@
 
 void debugPrint(const char *text)
 {
-#ifdef M_DEBUG
+#ifdef SERIAL_DEBUG
   Serial.println(text);
+#endif
+#ifdef TELNET_DEBUG
+  telnet.println(text);
 #endif
 }
 
@@ -11,16 +14,27 @@ void debugPrintf(const char *format, ...)
 {
   va_list args;
   va_start(args, format);
-#ifdef M_DEBUG
-  Serial.printf(format, args);
+
+#if defined(SERIAL_DEBUG) || defined(TELNET_DEBUG)
+  char buffer[128];
+  vsnprintf(buffer, sizeof(buffer), format, args);
+#endif
+#ifdef SERIAL_DEBUG
+  Serial.print(buffer);
+#endif
+#ifdef TELNET_DEBUG
+  telnet.println(buffer);
 #endif
   va_end(args);
 }
 
 void debugPrint(const IPAddress ip)
 {
-#ifdef M_DEBUG
+#ifdef SERIAL_DEBUG
   Serial.println(ip);
+#endif
+#ifdef TELNET_DEBUG
+  telnet.println(ip);
 #endif
 }
 

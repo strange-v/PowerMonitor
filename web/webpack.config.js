@@ -1,6 +1,6 @@
 const path = require('path'),
     fs = require('fs'),
-    ini = require('ini'),
+    env = require("../env.json"),
     webpack = require("webpack"),
     TerserPlugin = require('terser-webpack-plugin'),
     CopyPlugin = require("copy-webpack-plugin"),
@@ -12,8 +12,7 @@ const path = require('path'),
     package = require('./package.json'),
     crypto = require('crypto');
 
-const platformio = ini.parse(fs.readFileSync('../platformio.ini', 'utf-8'));
-const moduleHost = platformio['env:REMOTE'].upload_port;
+const moduleHost = env.otaHost;
 const mode = process.argv[process.argv.indexOf('--mode') + 1];
 const isProduction = mode === 'production';
 const dstProd = '../data';

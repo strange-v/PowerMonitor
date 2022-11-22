@@ -17,6 +17,9 @@ void WiFiEvent(WiFiEvent_t event)
 
     ethConnected = true;
     initOta();
+#ifdef TELNET_DEBUG
+    telnet.begin();
+#endif
     initTime();
     connectToMqttTimerHandler();
     break;
