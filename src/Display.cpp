@@ -4,7 +4,8 @@ void taskUpdateDisplay(void *pvParameters)
 {
     for (;;)
     {
-        xEventGroupWaitBits(eg, EVENT_UPDATE_DISPLAY, pdTRUE, pdTRUE, portMAX_DELAY);
+        if (!xEventGroupWaitBits(eg, EVENT_UPDATE_DISPLAY, pdTRUE, pdTRUE, portMAX_DELAY))
+            continue;
 
         char buf[32];
         uint8_t y = 0;

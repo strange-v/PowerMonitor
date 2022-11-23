@@ -26,7 +26,8 @@ void taskUpdateWebClients(void *pvParameters)
 {
     for (;;)
     {
-        xEventGroupWaitBits(eg, EVENT_UPDATE_WEB_CLIENTS, pdTRUE, pdTRUE, portMAX_DELAY);
+        if (!xEventGroupWaitBits(eg, EVENT_UPDATE_WEB_CLIENTS, pdTRUE, pdTRUE, portMAX_DELAY))
+            continue;
 
         StaticJsonDocument<256> doc;
         char buffer[256];

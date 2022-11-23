@@ -4,7 +4,8 @@ void taskRetrieveData(void *pvParameters)
 {
     for (;;)
     {
-        xEventGroupWaitBits(eg, EVENT_RETRIEVE_DATA, pdTRUE, pdTRUE, portMAX_DELAY);
+        if (!xEventGroupWaitBits(eg, EVENT_RETRIEVE_DATA, pdTRUE, pdTRUE, portMAX_DELAY))
+            continue;
 
         if (xSemaphoreTake(semaPzem, TICKS_TO_WAIT12) == pdTRUE)
         {
@@ -57,7 +58,8 @@ void taskResetEnergy(void *pvParameters)
 {
     for (;;)
     {
-        xEventGroupWaitBits(eg, EVENT_RESET_ENERGY, pdTRUE, pdTRUE, portMAX_DELAY);
+        if (!xEventGroupWaitBits(eg, EVENT_RESET_ENERGY, pdTRUE, pdTRUE, portMAX_DELAY))
+            continue;
 
         if (!isTimeSynchronized())
             continue;

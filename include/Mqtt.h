@@ -27,6 +27,8 @@ struct MqttMessage
 {
     char topic[64];
     char data[512];
+    size_t len;
+    bool retain;
 };
 
 void configureMqtt();
@@ -36,7 +38,7 @@ void onMqttConnect(bool sessionPresent);
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason);
 void queueMqttDiscoveryMessages();
 MqttMessage composeMqttMessage(NodeData data);
-MqttMessage composeMqttDiscoveryMessage(const char *name, const char *unit, const char *tpl);
-uint16_t _mqttPublish(const char *topic, const char *data);
+MqttMessage composeMqttDiscoveryMessage(const char *name, const char *unit, const char *stateClass, const char *tpl);
+uint16_t _mqttPublish(const char *topic, const char *data, size_t length, bool retain = false);
 
 #endif

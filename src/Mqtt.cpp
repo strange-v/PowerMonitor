@@ -35,7 +35,7 @@ void taskSendMqttMessages(void *pvParameters)
     {
         if (xQueueReceive(qMqtt, &msg, QUEUE_RECEIVE_DELAY))
         {
-            _mqttPublish(msg.topic, msg.data);
+            _mqttPublish(msg.topic, msg.data, msg.len, msg.retain);
         }
     }
 }
@@ -55,33 +55,36 @@ void queueMqttDiscoveryMessages()
 {
     if (!moduleSettings.enableHomeAssistant)
         return;
+
+    char classMeasurement[] = "measurement";
+    char classTotalIncreasing[] = "total_increasing";
     
     {
-        MqttMessage msg = composeMqttDiscoveryMessage("Voltage", "V", "{{ value_json.v | round(1) }}");
+        MqttMessage msg = composeMqttDiscoveryMessage("Voltage", "V", classMeasurement, "{{ value_json.v | round(1) }}");
         xQueueSendToBack(qMqtt, &msg, 0);
     }
     {
-        MqttMessage msg = composeMqttDiscoveryMessage("Frequency", "Hz", "{{ value_json.f | round(0) }}");
+        MqttMessage msg = composeMqttDiscoveryMessage("Frequency", "Hz", classMeasurement, "{{ value_json.f | round(0) }}");
         xQueueSendToBack(qMqtt, &msg, 0);
     }
     {
-        MqttMessage msg = composeMqttDiscoveryMessage("Power", "W", "{{ value_json.p | round(1) }}");
+        MqttMessage msg = composeMqttDiscoveryMessage("Power", "W", classMeasurement, "{{ value_json.p | round(1) }}");
         xQueueSendToBack(qMqtt, &msg, 0);
     }
     {
-        MqttMessage msg = composeMqttDiscoveryMessage("Current", "A", "{{ value_json.c | round(2) }}");
+        MqttMessage msg = composeMqttDiscoveryMessage("Current", "A", classMeasurement, "{{ value_json.c | round(2) }}");
         xQueueSendToBack(qMqtt, &msg, 0);
     }
     {
-        MqttMessage msg = composeMqttDiscoveryMessage("Power Factor", "%", "{{ (value_json.pf * 100) | round(0) }}");
+        MqttMessage msg = composeMqttDiscoveryMessage("Power Factor", "%", classMeasurement, "{{ (value_json.pf * 100) | round(0) }}");
         xQueueSendToBack(qMqtt, &msg, 0);
     }
     {
-        MqttMessage msg = composeMqttDiscoveryMessage("Energy", "kWh", "{{ value_json.e | round(1) }}");
+        MqttMessage msg = composeMqttDiscoveryMessage("Energy", "kWh", classTotalIncreasing, "{{ value_json.e | round(1) }}");
         xQueueSendToBack(qMqtt, &msg, 0);
     }
     {
-        MqttMessage msg = composeMqttDiscoveryMessage("Uptime", "s", "{{ value_json.u }}");
+        MqttMessage msg = composeMqttDiscoveryMessage("Uptime", "s", classTotalIncreasing, "{{ value_json.u }}");
         xQueueSendToBack(qMqtt, &msg, 0);
     }
 }
@@ -101,21 +104,24 @@ MqttMessage composeMqttMessage(NodeData data)
 
     serializeJson(doc, msg.data, sizeof(msg.data));
     strlcpy(msg.topic, moduleSettings.mqttTopic, sizeof(moduleSettings.mqttTopic));
+    
+    msg.retain = false;
+    msg.len = strlen(msg.data);
 
     return msg;
 }
 
-MqttMessage composeMqttDiscoveryMessage(const char *name, const char *unit, const char *tpl)
+MqttMessage composeMqttDiscoveryMessage(const char *name, const char *unit, const char *stateClass, const char *tpl)
 {
     MqttMessage msg;
     StaticJsonDocument<512> doc;
 
     JsonObject dev  = doc.createNestedObject("dev");
     dev["name"] = Cfg::name;
-    dev["sw_version"] = Cfg::version;
-    dev["manufacturer"] = Cfg::manufacturer;
-    dev["model"] = Cfg::model;
-    dev["identifiers"] = ETH.macAddress().c_str();
+    dev["sw"] = Cfg::version;
+    dev["mf"] = Cfg::manufacturer;
+    dev["mdl"] = Cfg::model;
+    dev["ids"] = ETH.macAddress().c_str();
 
     String devCla = strcmp(name, "Uptime") == 0
         ? String("duration")
@@ -129,6 +135,7 @@ MqttMessage composeMqttDiscoveryMessage(const char *name, const char *unit, cons
     doc["name"] = name;
     doc["uniq_id"] = uniqId;
     doc["stat_t"] = moduleSettings.mqttTopic;
+    doc["stat_cla"] = stateClass;
     doc["unit_of_meas"] = unit;
     doc["dev_cla"] = devCla.c_str();
     doc["frc_upd"] = true;
@@ -137,10 +144,13 @@ MqttMessage composeMqttDiscoveryMessage(const char *name, const char *unit, cons
     sprintf(msg.topic, "%s/sensor/%s/config", moduleSettings.haDiscoveryPrefix, devCla.c_str());
     serializeJson(doc, msg.data, sizeof(msg.data));
 
+    msg.retain = true;
+    msg.len = strlen(msg.data);
+
     return msg;
 }
 
-uint16_t _mqttPublish(const char *topic, const char *data)
+uint16_t _mqttPublish(const char *topic, const char *data, size_t length, bool retain)
 {
-    return mqtt.publish(topic, 2, false, data);
+    return mqtt.publish(topic, 2, retain, data, length);
 }
