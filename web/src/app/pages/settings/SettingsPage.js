@@ -85,15 +85,20 @@ export default class SettingsPage extends BasePage {
         document.getElementById('form').addEventListener('submit', (event) => this._onSubmit(event), false);
     }
 
-    _disableFiled(id, disabled) {
+    _disableFiled(id, disable) {
         const el = document.getElementById(id);
 
-        if (disabled) {
-            el.disabled = disabled;
+        if (disable) {
+            el.disabled = disable;
             el.parentElement.classList.add('disabled')
         } else {
-            el.disabled = disabled;
+            el.disabled = disable;
             el.parentElement.classList.remove('disabled')
+        }
+
+        const field = this._getFields().find(f => f.id == id);
+        if (field && field.refs) {
+            field.refs.forEach(ref => this._disableFiled(ref, disable))
         }
     }
 
@@ -121,7 +126,7 @@ export default class SettingsPage extends BasePage {
             { id: 'voltageMax', prop: 'vMax' },
             { id: 'powerMax', prop: 'pMax' },
             { id: 'currentMax', prop: 'cMax' },
-            { id: 'enableMqtt', prop: 'mqtt', refs: ['mqttServer', 'mqttUser', 'mqttPassword', 'mqttTopic'] },
+            { id: 'enableMqtt', prop: 'mqtt', refs: ['mqttServer', 'mqttUser', 'mqttPassword', 'mqttTopic', 'enableHomeAssistant'] },
             {
                 id: 'mqttServer',
                 deps: ['mqttHost', 'mqttPort'],

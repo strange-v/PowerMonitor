@@ -53,7 +53,7 @@ void onMqttDisconnect(AsyncMqttClientDisconnectReason reason)
 
 void queueMqttDiscoveryMessages()
 {
-    if (!moduleSettings.enableHomeAssistant)
+    if (!moduleSettings.enableMqtt || !moduleSettings.enableHomeAssistant)
         return;
 
     char classMeasurement[] = "measurement";
