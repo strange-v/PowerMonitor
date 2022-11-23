@@ -81,6 +81,7 @@ void setup()
   WiFi.onEvent(WiFiEvent);
   ETH.begin();
 
+  xTaskCreatePinnedToCore(taskHandleOta, "ota", TaskStack15K, NULL, Priority5, NULL, Core1);
   xTaskCreatePinnedToCore(taskRetrieveData, "rd", TaskStack15K, NULL, Priority3, NULL, Core1);
   xTaskCreatePinnedToCore(taskUpdateDisplay, "ud", TaskStack10K, NULL, Priority3, NULL, Core1);
   xTaskCreatePinnedToCore(taskUpdateWebClients, "uwc", TaskStack15K, NULL, Priority3, NULL, Core1);
@@ -105,7 +106,6 @@ void loop()
 {
   if (ethConnected)
   {
-    ArduinoOTA.handle();
 #ifdef TELNET_DEBUG
     telnet.loop();
 #endif

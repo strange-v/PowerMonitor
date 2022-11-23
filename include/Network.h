@@ -19,5 +19,6 @@ extern Settings moduleSettings;
 void WiFiEvent(WiFiEvent_t event);
 void conectNetworkTimerHandler();
 void initOta();
+void taskHandleOta(void *pvParameters);
 
 #endif

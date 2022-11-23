@@ -49,3 +49,14 @@ void initOta()
   ArduinoOTA.setPassword(moduleSettings.otaPassword);
   ArduinoOTA.begin();
 }
+
+void taskHandleOta(void *pvParameters)
+{
+  for (;;)
+  {
+    if (ethConnected)
+      ArduinoOTA.handle();
+    
+    delay(2000);
+  }
+}
