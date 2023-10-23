@@ -15,8 +15,8 @@ export default class Router extends EventTarget {
         this._route = this.getRoute();
         if (this._route == '')
             this.setRoute('/');
-        
-        this._dispatchChangeEvent();
+        else
+            this._dispatchChangeEvent();
     }
 
     on(event, method, scope) {
@@ -33,7 +33,7 @@ export default class Router extends EventTarget {
     }
 
     getRoute() {
-        return window.location.hash.substring(1); //.replace(/\//ig, '/');
+        return window.location.hash.substring(1);
     }
 
     _dispatchChangeEvent() {
